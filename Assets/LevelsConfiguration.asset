@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ff99172b648af44cb9c6badc78fa1bf, type: 3}
+  m_Name: LevelsConfiguration
+  m_EditorClassIdentifier: 
+  Bloks:
+  - {fileID: 21300000, guid: 1d26f8f953bdbbf479ecff746bfecf3d, type: 3}
+  - {fileID: 21300000, guid: 6efb1e2d4652a1c43a8af14d144ebb89, type: 3}
+  Backgrounds:
+  - {fileID: 21300000, guid: f8a0a7b2a023ba34d974ffd49af15a3c, type: 3}
+  LevelsJSON: {fileID: 4900000, guid: 0fa4c97b71428af44addfa2d675df310, type: 3}
