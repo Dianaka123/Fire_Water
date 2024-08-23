@@ -1,49 +1,45 @@
 ﻿using Assets.Scripts.Configs;
 using Assets.Scripts.Managers;
+using Assets.Scripts.Services.Data;
 using Assets.Scripts.Services.Interfaces;
 using System;
 using UnityEngine;
 
 namespace Assets.Scripts.Services
 {
-    public class BoardService : IBoardService
+    public class GridBuilder : IGridBuilder
     {
         private readonly ICanvasManger _canvasManager;
         
-        public BoardService(ICanvasManger canvasManger)
+        public GridBuilder(ICanvasManger canvasManger)
         {
             _canvasManager = canvasManger;
         }
 
-        private Vector2[,] _indexes;
-        public Vector2[,] Indexes => _indexes;
-        
-        private float _cellSize;
-        public float CellSize => _cellSize;
+        private GridConfig _currentGrid;
 
-        public void CreateBoardForLevel(Vector2Int gridSize, BoardConfig boardConfig)
+        public GridConfig CreateGridForLevel(Vector2Int gridSize, BoardConfig boardConfig)
         {
             var rows = gridSize.y;
             var columns = gridSize.x;
 
             if(!IsGridSizeValid(gridSize) || !IsBoardConfigValid(boardConfig))
             {
-                _indexes = null;
                 throw new ArgumentException("Invalid parameters.");
             }
 
             //optimization
-            if(_indexes != null && _indexes.Length == rows * columns)
+            if(_currentGrid.Indexes?.Length == rows * columns)
             {
-                return;
+                return _currentGrid;
             }
 
-            _indexes = new Vector2[rows, columns];
+            var indexes = new Vector2[rows, columns];
 
             var boardSize = CalculateBoardSize(boardConfig);
 
-            _cellSize = CalculateCellSize(boardSize, rows, columns);
-            var offset = OffsetForCentralizeBlocks(_cellSize, boardSize.x, columns);
+            var cellSize = CalculateCellSize(boardSize, rows, columns);
+            var offset = OffsetForCentralizeBlocks(cellSize, boardSize.x, columns);
 
             var bottomCoordinate = new Vector3(-boardSize.x / 2 + offset / 2, -boardSize.y / 2);
 
@@ -54,13 +50,15 @@ namespace Assets.Scripts.Services
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    _indexes[i, j] = new Vector2(x, y);
-                    x += _cellSize;
+                    indexes[i, j] = new Vector2(x, y);
+                    x += cellSize;
                 }
 
                 x = bottomCoordinate.x;
-                y += _cellSize;
+                y += cellSize;
             }
+
+            return new GridConfig() { Indexes = indexes, CellSize = cellSize };
         }
 
         private Vector2 CalculateBoardSize(BoardConfig config)
