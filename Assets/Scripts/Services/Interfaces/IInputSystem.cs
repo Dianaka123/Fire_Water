@@ -13,8 +13,6 @@ namespace Assets.Scripts.Services.Interfaces
 
     public interface IInputSystem
     {
-        bool IsSwiping { get; }
-        Touch? GetInputTouch();
-        Direction Direction { get; }
+        SwipeState? CheckSwipe();
     }
 }

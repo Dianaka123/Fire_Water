@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Assets.Scripts.Views;
 using System;
-using System.ComponentModel;
 
 namespace Assets.Scripts.Configs
 {
@@ -24,6 +23,8 @@ namespace Assets.Scripts.Configs
     {
         public Sprite Sprite;
         public BoardConfig BoardConfig;
+        public int StartLevelId;
+        public int EndLevelId;
     }
 
     [Serializable]

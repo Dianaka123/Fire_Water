@@ -16,7 +16,9 @@ namespace Assets.Scripts.Installers
             Container.BindInterfacesAndSelfTo<LevelManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<GridManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<BlocksManger>().AsSingle();
+            Container.BindInterfacesAndSelfTo<MoveBlocksManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<InputSystem>().AsSingle();
+            Container.BindInterfacesAndSelfTo<LevelJsonConverter>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<SaveLevelService>().AsSingle();
             

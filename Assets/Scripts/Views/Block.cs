@@ -15,10 +15,18 @@ namespace Assets.Scripts.Views
         [SerializeField]
         private float _scaleRatio = 1.6f;
 
+        [SerializeField]
+        private RectTransform _rectTransform;
+
         public void SetSize(float cellSize)
         {
             var scaledSize = cellSize * _scaleRatio;
             _image.rectTransform.sizeDelta = new Vector2 (scaledSize, scaledSize);
+        }
+
+        public void MoveTo(Vector2 to)
+        {
+            _rectTransform.localPosition = to;
         }
     }
 }

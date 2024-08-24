@@ -16,7 +16,5 @@ namespace Assets.Scripts.Configs
         public int RowCount;
         [JsonProperty("levelBlocksSequence")]
         public int[] LevelBlocksSequence;
-        [JsonProperty("backgroundId")]
-        public int BackgroundId;
     }
 }

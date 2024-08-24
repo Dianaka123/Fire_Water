@@ -5,11 +5,9 @@
 	 "columnCount": 4,
 	 "rowCount": 2,
 	 "levelBlocksSequence" :
-	 						[0, 1, 0, 0,
-							0, 1, 0, 0,
-							1, 0, 1, 1,
-							0, 1, 0, 0,
-							0, 0, -1, -1],
+	 						[
+							0, 1, -1, -1,
+							0, 0, 1, 1],
 	 "backgroundId": 0
 	}
 ]

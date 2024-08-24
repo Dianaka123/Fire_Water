@@ -4,24 +4,28 @@ using UnityEngine;
 
 namespace Assets.Scripts.Services
 {
+    public struct SwipeState
+    {
+        public Direction Direction;
+        public bool IsSwiping;
+        public Vector3 startPosition;
+    }
+
     public class InputSystem : IInputSystem
     {
         private Direction _direction = Direction.None;
-        public Direction Direction => _direction;
-
-        public bool IsSwiping => _swiping;
-
         private Touch? _initialTouch;
         private bool _swiping;
 
         private float minSwipeDistance;
         private float errorRange;
 
-        public Touch? GetInputTouch()
+        public SwipeState? CheckSwipe()
         {
             if (Input.touchCount > 0)
             {
                 Touch touch = Input.GetTouch(0);
+                
                 if (touch.phase == TouchPhase.Began)
                 {
                     _initialTouch = touch;
@@ -41,9 +45,18 @@ namespace Assets.Scripts.Services
                 }
                 else if (touch.phase == TouchPhase.Ended)
                 {
+                    var result = new SwipeState()
+                    {
+                        Direction = _direction,
+                        IsSwiping = _swiping,
+                        startPosition = _initialTouch.Value.position,
+                    };
+
                     _initialTouch = null;
                     _swiping = false;
                     _direction = Direction.None;
+
+                    return result.IsSwiping ? result : null;
                 }
                 else if (touch.phase == TouchPhase.Canceled)
                 {
@@ -53,7 +66,7 @@ namespace Assets.Scripts.Services
                 }
             }
 
-            return _initialTouch;
+            return null;
         }
 
         void CalculateSwipeDirection(float deltaX, float deltaY)

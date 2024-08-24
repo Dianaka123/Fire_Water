@@ -21,15 +21,15 @@ namespace Assets.Scripts.Services
             _gameResources = gameResources;
         }
 
-        public void BuildLevel(LevelDesc level)
+        public void BuildLevel(Level level)
         {
-            var background = _gameResources.Backgrounds[level.BackgroundId];
+            var background = _gameResources.Backgrounds[0];
             _canvasManager.SetBackground(background.Sprite);
             
-            var gridSize = new Vector2Int(level.ColumnCount, level.RowCount);
+            var gridSize = new Vector2Int(level.LevelBlocksSequence.GetLength(1), level.LevelBlocksSequence.GetLength(0));
             var grid = _gridManager.CreateGrid(gridSize, background.BoardConfig);
 
-            _blocksManger.CreateBlocks(level, grid);
+            _blocksManger.CreateBlocks(level, grid, _canvasManager.DynamicCanvasTransform);
         }
     }
 }

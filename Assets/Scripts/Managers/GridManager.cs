@@ -12,7 +12,7 @@ namespace Assets.Scripts.Managers
         private readonly IGridBuilder _gridBuilder;
         private readonly ICanvasManger _canvasManger;
 
-        public GridData CurrentGrid { get; private set; }
+        private GridData _currentGrid;
 
         public GridManager(IGridBuilder gridBuilder, ICanvasManger canvasManger)
         {
@@ -22,22 +22,22 @@ namespace Assets.Scripts.Managers
 
         public GridData CreateGrid(Vector2Int gridSize, BoardConfig boardConfig)
         {
-            CurrentGrid = _gridBuilder.CreateGridForLevel(gridSize, boardConfig, _canvasManger.Size);
-            return CurrentGrid;
+            _currentGrid = _gridBuilder.CreateGridForLevel(gridSize, boardConfig, _canvasManger.Size);
+            return _currentGrid;
         }
 
         public Vector2Int GetCellIndexByScreenPosition(Vector3 screenPosition)
         {
             var position = TranslateToCanvasCoordinate(screenPosition);
-            var column = CurrentGrid.Indexes.GetLength(1);
-            var row = CurrentGrid.Indexes.GetLength(0);
-            var halfCellSize = CurrentGrid.CellSize / 2;
+            var column = _currentGrid.Indexes.GetLength(1);
+            var row = _currentGrid.Indexes.GetLength(0);
+            var halfCellSize = _currentGrid.CellSize / 2;
 
             for (int i = 0; i < row; i++)
             {
                 for(int j = 0; j < column; j++)
                 {
-                    var cellPosition = CurrentGrid.Indexes[i, j];
+                    var cellPosition = _currentGrid.Indexes[i, j];
                     if ((cellPosition.x - halfCellSize < position.x && position.x < cellPosition.x + halfCellSize)
                         && (cellPosition.y - halfCellSize < position.y && position.y < cellPosition.y + halfCellSize))
                     {
@@ -46,6 +46,11 @@ namespace Assets.Scripts.Managers
                 }
             }
             return Vector2Int.one * -1;
+        }
+
+        public Vector2 GetScreenPositionByCellIndex(Vector2Int cellIndex)
+        {
+            return _currentGrid.Indexes[cellIndex.x, cellIndex.y];
         }
 
         private Vector2 TranslateToCanvasCoordinate(Vector3 screenPosition)

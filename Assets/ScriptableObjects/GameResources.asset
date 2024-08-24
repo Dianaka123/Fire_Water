@@ -13,10 +13,12 @@ MonoBehaviour:
   m_Name: GameResources
   m_EditorClassIdentifier: Game:Assets.Scripts.Configs:GameResources
   Bloks:
-  - {fileID: 1928056973106983579, guid: dae997b3bc3bf854f8f403cec811bfa4, type: 3}
-  - {fileID: 3227894962661816619, guid: 6c2c7302307fafe40816e0ac03f63747, type: 3}
+  - {fileID: 8518390966623739180, guid: 749b525b1c2e40f488060094eafeb83d, type: 3}
+  - {fileID: 411319984972714039, guid: 6f1545b84241b6847893807f808b4e2d, type: 3}
   Backgrounds:
   - Sprite: {fileID: 21300000, guid: f8a0a7b2a023ba34d974ffd49af15a3c, type: 3}
     BoardConfig:
-      RelativeSideOffset: 0.1
-      RelativeBottomOffset: 0.2
+      RelativeSideOffset: 0.2
+      RelativeBottomOffset: 0.4
+    StartLevelId: 0
+    EndLevelId: 3
