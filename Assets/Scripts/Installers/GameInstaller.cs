@@ -16,6 +16,7 @@ namespace Assets.Scripts.Installers
             Container.BindInterfacesAndSelfTo<LevelManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<GridManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<BlocksManger>().AsSingle();
+            Container.BindInterfacesAndSelfTo<InputSystem>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<SaveLevelService>().AsSingle();
             
@@ -28,6 +29,7 @@ namespace Assets.Scripts.Installers
             Container.BindInterfacesAndSelfTo<GameSMClient>().AsSingle();
 
             Container.Bind<InitState>().AsSingle();
+            Container.Bind<PlayState>().AsSingle();
             Container.Bind<EmptyState>().AsSingle();
         }
     }

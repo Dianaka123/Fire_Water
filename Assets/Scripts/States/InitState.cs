@@ -12,14 +12,16 @@ namespace Assets.Scripts.States
         private readonly LevelBuilder _levelBuilder;
         private readonly ISaveLevelService _saveLevelService;
         private readonly ILevelManager _levelManager;
-        private readonly EmptyState _emptyState;
+        private readonly PlayState _playState;
 
-        public InitState(ISMContext context, LevelBuilder levelBuilder, ISaveLevelService saveLevelService, ILevelManager levelManager, EmptyState emptyState) : base(context)
+        public InitState(ISMContext context, LevelBuilder levelBuilder,
+            ISaveLevelService saveLevelService, ILevelManager levelManager,
+            PlayState playState) : base(context)
         {
             _levelBuilder = levelBuilder;
             _saveLevelService = saveLevelService;
             _levelManager = levelManager;
-            _emptyState = emptyState;
+            _playState = playState;
         }
 
         public async override UniTask Run(CancellationToken token)
@@ -28,7 +30,7 @@ namespace Assets.Scripts.States
             var level = _levelManager.CurrentLevel;
 
             _levelBuilder.BuildLevel(level);
-            GoTo(_emptyState, token).Forget();
+            GoTo(_playState, token).Forget();
         }
 
         private async UniTask UpdateLevelStateBySavingData(CancellationToken token)

@@ -1,6 +1,7 @@
 using Assets.Scripts.Configs;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Managers.Interfaces;
+using UnityEngine;
 
 namespace Assets.Scripts.Services
 {
@@ -22,8 +23,12 @@ namespace Assets.Scripts.Services
 
         public void BuildLevel(LevelDesc level)
         {
-            _canvasManager.SetBackground(_gameResources.Backgrounds[level.BackgroundId].Sprite);
-            var grid = _gridManager.CreateGrid(level);
+            var background = _gameResources.Backgrounds[level.BackgroundId];
+            _canvasManager.SetBackground(background.Sprite);
+            
+            var gridSize = new Vector2Int(level.ColumnCount, level.RowCount);
+            var grid = _gridManager.CreateGrid(gridSize, background.BoardConfig);
+
             _blocksManger.CreateBlocks(level, grid);
         }
     }

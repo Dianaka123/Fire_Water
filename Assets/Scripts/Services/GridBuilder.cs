@@ -1,5 +1,4 @@
 ﻿using Assets.Scripts.Configs;
-using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Data;
 using Assets.Scripts.Services.Interfaces;
 using System;
@@ -9,16 +8,9 @@ namespace Assets.Scripts.Services
 {
     public class GridBuilder : IGridBuilder
     {
-        private readonly ICanvasManger _canvasManager;
-        
-        public GridBuilder(ICanvasManger canvasManger)
-        {
-            _canvasManager = canvasManger;
-        }
-
         private GridData _currentGrid;
 
-        public GridData CreateGridForLevel(Vector2Int gridSize, BoardConfig boardConfig)
+        public GridData CreateGridForLevel(Vector2Int gridSize, BoardConfig boardConfig, Vector2 windowSize)
         {
             var rows = gridSize.y;
             var columns = gridSize.x;
@@ -36,7 +28,7 @@ namespace Assets.Scripts.Services
 
             var indexes = new Vector2[rows, columns];
 
-            var boardSize = CalculateBoardSize(boardConfig);
+            var boardSize = CalculateBoardSize(boardConfig, windowSize);
 
             var cellSize = CalculateCellSize(boardSize, rows, columns);
 
@@ -61,12 +53,10 @@ namespace Assets.Scripts.Services
             return new GridData() { Indexes = indexes, CellSize = cellSize };
         }
 
-        private Vector2 CalculateBoardSize(BoardConfig config)
+        private Vector2 CalculateBoardSize(BoardConfig config, Vector2 windowSize)
         {
-            var canvasSize = _canvasManager.Size;
-
-            var width = canvasSize.x - 2 * config.SideOffset;
-            var height = canvasSize.y - 2 * config.BottomOffset;
+            var width = windowSize.x - 2 * config.SideOffset;
+            var height = windowSize.y - 2 * config.BottomOffset;
 
             return new Vector2(width, height);
         }
