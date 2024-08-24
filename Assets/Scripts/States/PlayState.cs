@@ -10,6 +10,7 @@ namespace Assets.Scripts.States
     public class PlayState : State
     {
         private readonly GridManager _gridManager;
+        private readonly LevelManager _levelManager;
         private readonly IInputSystem _inputSystem;
 
         public PlayState(GridManager gridManager,IInputSystem inputSystem,

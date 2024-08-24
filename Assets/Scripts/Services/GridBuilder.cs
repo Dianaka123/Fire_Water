@@ -55,10 +55,18 @@ namespace Assets.Scripts.Services
 
         private Vector2 CalculateBoardSize(BoardConfig config, Vector2 windowSize)
         {
-            var width = windowSize.x - 2 * config.SideOffset;
-            var height = windowSize.y - 2 * config.BottomOffset;
+            var sideOffset = CalculateOffset(config.RelativeSideOffset, windowSize.x);
+            var bottomOffset = CalculateOffset(config.RelativeBottomOffset, windowSize.y);
+
+            var width = windowSize.x - sideOffset;
+            var height = windowSize.y - bottomOffset;
 
             return new Vector2(width, height);
+        }
+
+        private float CalculateOffset(float offset, float sideSize)
+        {
+            return sideSize * offset;
         }
         
         private float CalculateCellSize(Vector2 boardSize, int rowCount, int columnCount)
@@ -78,7 +86,7 @@ namespace Assets.Scripts.Services
 
         private bool IsBoardConfigValid(BoardConfig boardConfig)
         {
-            return boardConfig.SideOffset >= 0 && boardConfig.BottomOffset >= 0;
+            return boardConfig.RelativeSideOffset >= 0 && boardConfig.RelativeBottomOffset >= 0;
         }
 
         private bool IsGridSizeValid(Vector2Int gridSize)

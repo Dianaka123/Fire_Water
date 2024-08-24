@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Assets.Scripts.Views;
 using System;
+using System.ComponentModel;
 
 namespace Assets.Scripts.Configs
 {
@@ -28,7 +29,9 @@ namespace Assets.Scripts.Configs
     [Serializable]
     public struct BoardConfig
     {
-        public float SideOffset;
-        public float BottomOffset;
+        [Range(0, 1)]
+        public float RelativeSideOffset;
+        [Range(0, 1)]
+        public float RelativeBottomOffset;
     }
 }

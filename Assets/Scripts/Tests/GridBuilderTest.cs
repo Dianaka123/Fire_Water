@@ -1,7 +1,5 @@
 using Assets.Scripts.Configs;
-using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services;
-using Moq;
 using NUnit.Framework;
 using System;
 using UnityEngine;
@@ -12,15 +10,12 @@ public class GridBuilderTest: ZenjectUnitTestFixture
     [Inject]
     GridBuilder gridBuilder;
 
+    private Vector2 windowSize = new Vector2(100, 100);
+
     [SetUp]
     public void Init()
     {
-        var mockCanvasManager = new Mock<ICanvasManger>();
-        mockCanvasManager.Setup(m => m.Size).Returns(new Vector2(100, 100));
-
-        Container.Bind<ICanvasManger>().FromInstance(mockCanvasManager.Object);
         Container.BindInterfacesAndSelfTo<GridBuilder>().AsSingle();
-        
 
         Container.Inject(this);
     }
@@ -32,11 +27,11 @@ public class GridBuilderTest: ZenjectUnitTestFixture
         var gridSize = new Vector2Int(columns, rows);
         var boardConfig = new BoardConfig()
         {
-            SideOffset = sideOffset,
-            BottomOffset = bottomOffset,
+            RelativeSideOffset = sideOffset,
+            RelativeBottomOffset = bottomOffset,
         };
 
-        var gridConfig = gridBuilder.CreateGridForLevel(gridSize, boardConfig);
+        var gridConfig = gridBuilder.CreateGridForLevel(gridSize, boardConfig, windowSize);
 
         Assert.NotNull(gridConfig.Indexes);
         Assert.That(gridConfig.Indexes[0, 0], Is.EqualTo(new Vector2(x, y)));
@@ -50,10 +45,10 @@ public class GridBuilderTest: ZenjectUnitTestFixture
         var gridSize = new Vector2Int(columns, rows);
         var boardConfig = new BoardConfig()
         {
-            SideOffset = sideOffset,
-            BottomOffset = bottomOffset,
+            RelativeSideOffset = sideOffset,
+            RelativeBottomOffset = bottomOffset,
         };
 
-        Assert.Throws<ArgumentException>(() => gridBuilder.CreateGridForLevel(gridSize, boardConfig));
+        Assert.Throws<ArgumentException>(() => gridBuilder.CreateGridForLevel(gridSize, boardConfig, windowSize));
     }
 }
