@@ -1,5 +1,5 @@
 ﻿using Assets.Scripts.Configs;
-using Assets.Scripts.Managers;
+using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Data;
 using Assets.Scripts.Services.Interfaces;
 using System;
@@ -16,9 +16,9 @@ namespace Assets.Scripts.Services
             _canvasManager = canvasManger;
         }
 
-        private GridConfig _currentGrid;
+        private GridData _currentGrid;
 
-        public GridConfig CreateGridForLevel(Vector2Int gridSize, BoardConfig boardConfig)
+        public GridData CreateGridForLevel(Vector2Int gridSize, BoardConfig boardConfig)
         {
             var rows = gridSize.y;
             var columns = gridSize.x;
@@ -39,12 +39,13 @@ namespace Assets.Scripts.Services
             var boardSize = CalculateBoardSize(boardConfig);
 
             var cellSize = CalculateCellSize(boardSize, rows, columns);
+
             var offset = OffsetForCentralizeBlocks(cellSize, boardSize.x, columns);
 
-            var bottomCoordinate = new Vector3(-boardSize.x / 2 + offset / 2, -boardSize.y / 2);
+            var bottomCenterCoordinate = new Vector3(-boardSize.x / 2 + offset / 2 + cellSize / 2, -boardSize.y / 2 + cellSize / 2);
 
-            var x = bottomCoordinate.x;
-            var y = bottomCoordinate.y;
+            var x = bottomCenterCoordinate.x ;
+            var y = bottomCenterCoordinate.y;
 
             for (int i = 0; i < rows; i++)
             {
@@ -54,20 +55,18 @@ namespace Assets.Scripts.Services
                     x += cellSize;
                 }
 
-                x = bottomCoordinate.x;
+                x = bottomCenterCoordinate.x;
                 y += cellSize;
             }
-
-            return new GridConfig() { Indexes = indexes, CellSize = cellSize };
+            return new GridData() { Indexes = indexes, CellSize = cellSize };
         }
 
         private Vector2 CalculateBoardSize(BoardConfig config)
         {
             var canvasSize = _canvasManager.Size;
-            var canvasScale = _canvasManager.LocalScale;
 
-            var width = (canvasSize.x - 2 * config.SideOffset) * canvasScale.x;
-            var height = (canvasSize.y - 2 * config.BottomOffset) * canvasScale.y;
+            var width = canvasSize.x - 2 * config.SideOffset;
+            var height = canvasSize.y - 2 * config.BottomOffset;
 
             return new Vector2(width, height);
         }
@@ -89,7 +88,7 @@ namespace Assets.Scripts.Services
 
         private bool IsBoardConfigValid(BoardConfig boardConfig)
         {
-            return boardConfig.SideOffset > 0 && boardConfig.BottomOffset > 0;
+            return boardConfig.SideOffset >= 0 && boardConfig.BottomOffset >= 0;
         }
 
         private bool IsGridSizeValid(Vector2Int gridSize)

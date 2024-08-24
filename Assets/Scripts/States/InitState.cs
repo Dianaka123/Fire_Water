@@ -1,27 +1,46 @@
-using Assets.Scripts.Configs;
+using Assets.Scripts.Managers.Interfaces;
+using Assets.Scripts.Services;
+using Assets.Scripts.Services.Interfaces;
 using Assets.Scripts.StateMachine;
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using Unity.Plastic.Newtonsoft.Json;
-using UnityEngine;
 
 namespace Assets.Scripts.States
 {
     public class InitState : State
     {
-        private readonly LevelsConfiguration _levelsConfiguration;
+        private readonly LevelBuilder _levelBuilder;
+        private readonly ISaveLevelService _saveLevelService;
+        private readonly ILevelManager _levelManager;
+        private readonly EmptyState _emptyState;
 
-        public InitState(ISMContext context, LevelsConfiguration levelsConfiguration) : base(context)
+        public InitState(ISMContext context, LevelBuilder levelBuilder, ISaveLevelService saveLevelService, ILevelManager levelManager, EmptyState emptyState) : base(context)
         {
-            _levelsConfiguration = levelsConfiguration;
+            _levelBuilder = levelBuilder;
+            _saveLevelService = saveLevelService;
+            _levelManager = levelManager;
+            _emptyState = emptyState;
         }
 
-        public override UniTask Run(CancellationToken token)
+        public async override UniTask Run(CancellationToken token)
         {
-            var levelInfo = JsonConvert.DeserializeObject<Level>(_levelsConfiguration.LevelsJSON.text);
-            Debug.Log(levelInfo);
+            await UpdateLevelStateBySavingData(token);
+            var level = _levelManager.CurrentLevel;
 
-            return UniTask.CompletedTask;
+            _levelBuilder.BuildLevel(level);
+            GoTo(_emptyState, token).Forget();
+        }
+
+        private async UniTask UpdateLevelStateBySavingData(CancellationToken token)
+        {
+            var saving = await _saveLevelService.GetSavedDataAsync(token);
+
+            if(saving == null)
+            {
+                return;
+            }
+
+            _levelManager.UpdateLevelBySavingData(saving);
         }
     }
 }

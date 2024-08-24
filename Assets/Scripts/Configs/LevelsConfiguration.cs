@@ -8,9 +8,14 @@ namespace Assets.Scripts.Configs
     [CreateAssetMenu(fileName = "LevelsConfiguration", menuName = "ScriptableObjects/LevelsConfiguration", order = 1)]
     public class LevelsConfiguration: ScriptableObject
     {
+        public TextAsset LevelsJSON;
+    }
+
+    [CreateAssetMenu(fileName = "GameResources", menuName = "ScriptableObjects/GameResources", order = 1)]
+    public class GameResources : ScriptableObject
+    {
         public List<Block> Bloks;
         public List<BackgroundConfig> Backgrounds;
-        public TextAsset LevelsJSON;
     }
 
     [Serializable]

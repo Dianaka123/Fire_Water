@@ -1,5 +1,5 @@
 using Assets.Scripts.Configs;
-using Assets.Scripts.Managers;
+using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services;
 using Moq;
 using NUnit.Framework;
@@ -17,7 +17,6 @@ public class GridBuilderTest: ZenjectUnitTestFixture
     {
         var mockCanvasManager = new Mock<ICanvasManger>();
         mockCanvasManager.Setup(m => m.Size).Returns(new Vector2(100, 100));
-        mockCanvasManager.Setup(m => m.LocalScale).Returns(Vector3.one);
 
         Container.Bind<ICanvasManger>().FromInstance(mockCanvasManager.Object);
         Container.BindInterfacesAndSelfTo<GridBuilder>().AsSingle();

@@ -6,9 +6,11 @@ using Zenject;
 public class ScriptableObjectsInstaller : ScriptableObjectInstaller<ScriptableObjectsInstaller>
 {
     public LevelsConfiguration LevelsConfiguration;
+    public GameResources GameResources;
 
     public override void InstallBindings()
     {
         Container.BindInstance(LevelsConfiguration);
+        Container.BindInstance(GameResources);
     }
 }

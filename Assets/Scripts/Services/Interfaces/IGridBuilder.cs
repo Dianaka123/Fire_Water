@@ -6,6 +6,6 @@ namespace Assets.Scripts.Services.Interfaces
 {
     public interface IGridBuilder
     {
-        GridConfig CreateGridForLevel(Vector2Int gridSize, BoardConfig boardConfig);
+        GridData CreateGridForLevel(Vector2Int gridSize, BoardConfig boardConfig);
     }
 }

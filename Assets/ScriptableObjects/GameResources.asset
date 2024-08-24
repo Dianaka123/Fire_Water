@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: GameResources
+  m_EditorClassIdentifier: Game:Assets.Scripts.Configs:GameResources
+  Bloks:
+  - {fileID: 1928056973106983579, guid: dae997b3bc3bf854f8f403cec811bfa4, type: 3}
+  - {fileID: 3227894962661816619, guid: 6c2c7302307fafe40816e0ac03f63747, type: 3}
+  Backgrounds:
+  - Sprite: {fileID: 21300000, guid: f8a0a7b2a023ba34d974ffd49af15a3c, type: 3}
+    BoardConfig:
+      SideOffset: 40
+      BottomOffset: 70
