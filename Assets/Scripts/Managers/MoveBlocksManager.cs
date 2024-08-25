@@ -1,5 +1,5 @@
 using Assets.Scripts.Managers.Interfaces;
-using System.Numerics;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Scripts.Managers
@@ -7,32 +7,40 @@ namespace Assets.Scripts.Managers
     public class MoveBlocksManager
     {
         private readonly ILevelManager _levelManager;
-        private readonly GridManager _gridManager;
-        private readonly BlocksManger _blocksManger;
+        private readonly IGridManager _gridManager;
+        private readonly IBlockManager _blocksManger;
 
-        private int _row => _levelManager.CurrentLevel.Row;
-        private int _column => _levelManager.CurrentLevel.Column;
+        private int _row => _levelManager.CurrentLevelSequence.GetLength(0);
+        private int _column => _levelManager.CurrentLevelSequence.GetLength(1);
 
-        public MoveBlocksManager(ILevelManager levelManager, BlocksManger blocksManger, GridManager gridManager)
+        public MoveBlocksManager(ILevelManager levelManager, IBlockManager blocksManger, IGridManager gridManager)
         {
             _levelManager = levelManager;
             _blocksManger = blocksManger;
             _gridManager = gridManager;
-
         }
 
-        public void MoveBlock(Vector2Int from, Vector2Int to)
+        public async UniTask MoveBlockAsync(Vector2Int from, Vector2Int to)
         {
-            if(to.x >= _row && to.x < 0 || to.y < 0 && to.y >= _column)
+            if(to.x >= _row || to.x < 0 || to.y < 0 || to.y >= _column)
             {
                 return;
             }
-            Debug.Log(to);
+
+            var isUp = (to - from).x > 0;
+
+            if (_levelManager.IsEmptyCell(from) 
+                || (isUp && _levelManager.IsEmptyCell(to)))
+            {
+                return;
+            }
+
+            _levelManager.SwitchBlocks(from, to);
 
             var startPosition = _gridManager.GetScreenPositionByCellIndex(from);
             var endPosition = _gridManager.GetScreenPositionByCellIndex(to);
 
-            _blocksManger.SwitchBlocks(from, to, startPosition, endPosition);
+            await _blocksManger.SwitchBlocksAsync(from, to, startPosition, endPosition);
         }
     }
 }

@@ -12,8 +12,8 @@ namespace Assets.Scripts.Services
 
         public GridData CreateGridForLevel(Vector2Int gridSize, BoardConfig boardConfig, Vector2 windowSize)
         {
-            var rows = gridSize.y;
-            var columns = gridSize.x;
+            var rows = gridSize.x;
+            var columns = gridSize.y;
 
             if(!IsGridSizeValid(gridSize) || !IsBoardConfigValid(boardConfig))
             {
@@ -58,8 +58,8 @@ namespace Assets.Scripts.Services
             var sideOffset = CalculateOffset(config.RelativeSideOffset, windowSize.x);
             var bottomOffset = CalculateOffset(config.RelativeBottomOffset, windowSize.y);
 
-            var width = windowSize.x - sideOffset;
-            var height = windowSize.y - bottomOffset;
+            var width = windowSize.x - sideOffset * 2; // offset from 2 sides
+            var height = windowSize.y - bottomOffset * 2;
 
             return new Vector2(width, height);
         }

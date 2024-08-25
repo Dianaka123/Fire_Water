@@ -8,11 +8,11 @@ namespace Assets.Scripts.Services
     public class LevelBuilder
     {
         private readonly ICanvasManger _canvasManager;
-        private readonly GridManager _gridManager;
-        private readonly BlocksManger _blocksManger;
+        private readonly IGridManager _gridManager;
+        private readonly IBlockManager _blocksManger;
         private readonly GameResources _gameResources;
 
-        public LevelBuilder(BlocksManger blocksManger, GridManager gridManager,
+        public LevelBuilder(IBlockManager blocksManger, IGridManager gridManager,
             ICanvasManger canvasManager, GameResources gameResources)
         {
             _blocksManger = blocksManger;
@@ -21,12 +21,12 @@ namespace Assets.Scripts.Services
             _gameResources = gameResources;
         }
 
-        public void BuildLevel(Level level)
+        public void BuildLevel(int[,] level)
         {
             var background = _gameResources.Backgrounds[0];
             _canvasManager.SetBackground(background.Sprite);
             
-            var gridSize = new Vector2Int(level.LevelBlocksSequence.GetLength(1), level.LevelBlocksSequence.GetLength(0));
+            var gridSize = new Vector2Int(level.GetLength(0), level.GetLength(1));
             var grid = _gridManager.CreateGrid(gridSize, background.BoardConfig);
 
             _blocksManger.CreateBlocks(level, grid, _canvasManager.DynamicCanvasTransform);

@@ -2,7 +2,9 @@ using Assets.Scripts.Configs;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services;
 using System;
+using System.Collections.Generic;
 using System.Threading;
+using UnityEngine;
 using Zenject;
 
 namespace Assets.Scripts.Managers
@@ -11,10 +13,14 @@ namespace Assets.Scripts.Managers
     {
         private readonly LevelsConfiguration _configuration;
         private readonly LevelJsonConverter _converter;
-        public Level CurrentLevel { get; private set; }
 
+        public int[,] CurrentLevelSequence => _currentLevel.LevelBlocksSequence;
+        public HashSet<int> LevelBlocksType => _currentLevel.LevelBlocksType;
+
+        private Level _currentLevel;
         private Level[] _levels;
         private int _levelId = 0;
+        
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         public LevelManager(LevelsConfiguration levelsConfiguration, LevelJsonConverter converter)
@@ -23,7 +29,7 @@ namespace Assets.Scripts.Managers
             _converter = converter;
         }
 
-        public async void Initialize()
+        public void Initialize()
         {
             _levels = _converter.DeserializeAllLevels(_configuration.LevelsJSON.text);
             UpdateCurrentLevel(_levels[_levelId]);
@@ -54,7 +60,21 @@ namespace Assets.Scripts.Managers
 
         private void UpdateCurrentLevel(Level level)
         {
-            CurrentLevel = level;
+            _currentLevel = level;
+        }
+
+        public void SwitchBlocks(Vector2Int from, Vector2Int to)
+        {
+            var block1 = CurrentLevelSequence[from.x, from.y];
+            var block2 = CurrentLevelSequence[to.x, to.y];
+
+            CurrentLevelSequence[from.x, from.y] = block2;
+            CurrentLevelSequence[to.x, to.y] = block1;
+        }
+
+        public bool IsEmptyCell(Vector2Int cellIndex)
+        {
+            return CurrentLevelSequence[cellIndex.x, cellIndex.y] == -1;
         }
     }
 }

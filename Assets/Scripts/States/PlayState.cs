@@ -34,7 +34,7 @@ namespace Assets.Scripts.States
                     var step = GetStepByDirection(swipeValue.Direction);
                     
                     var nextCell = startIndex + step;
-                    _moveBlocksManager.MoveBlock(startIndex, nextCell);
+                    _moveBlocksManager.MoveBlockAsync(startIndex, nextCell);
                 }
             }
             return UniTask.CompletedTask;
@@ -47,10 +47,10 @@ namespace Assets.Scripts.States
             switch (direction)
             {
                 case Direction.Up:
-                    step.x = -1;
+                    step.x = 1;
                     break;
                 case Direction.Down:
-                    step.x = 1;
+                    step.x = -1;
                     break;
                 case Direction.Right:
                     step.y = 1;

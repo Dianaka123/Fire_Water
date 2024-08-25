@@ -17,8 +17,8 @@ namespace Assets.Scripts.Services
         private Touch? _initialTouch;
         private bool _swiping;
 
-        private float minSwipeDistance;
-        private float errorRange;
+        private float minSwipeDistance = 1;
+        private float errorRange = 100;
 
         public SwipeState? CheckSwipe()
         {
@@ -32,14 +32,13 @@ namespace Assets.Scripts.Services
                 }
                 else if (touch.phase == TouchPhase.Moved && _initialTouch.HasValue)
                 {
-                    var deltaX = touch.position.x - _initialTouch.Value.position.x; //greater than 0 is right and less than zero is left
-                    var deltaY = touch.position.y - _initialTouch.Value.position.y; //greater than 0 is up and less than zero is down
+                    var deltaX = touch.position.x - _initialTouch.Value.position.x;
+                    var deltaY = touch.position.y - _initialTouch.Value.position.y;
                     var swipeDistance = Mathf.Abs(deltaX) + Mathf.Abs(deltaY);
 
                     if (swipeDistance > minSwipeDistance && (Mathf.Abs(deltaX) > 0 || Mathf.Abs(deltaY) > 0))
                     {
                         _swiping = true;
-
                         CalculateSwipeDirection(deltaX, deltaY);
                     }
                 }

@@ -3,11 +3,10 @@ using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Data;
 using Assets.Scripts.Services.Interfaces;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Assets.Scripts.Managers
 {
-    public class GridManager
+    public class GridManager : IGridManager
     {
         private readonly IGridBuilder _gridBuilder;
         private readonly ICanvasManger _canvasManger;

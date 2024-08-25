@@ -9,16 +9,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: c7ce81d99b0e27d4b97e7085ad252198, type: 3}
   m_Name: GameResources
-  m_EditorClassIdentifier: Game:Assets.Scripts.Configs:GameResources
+  m_EditorClassIdentifier: 
   Bloks:
   - {fileID: 8518390966623739180, guid: 749b525b1c2e40f488060094eafeb83d, type: 3}
   - {fileID: 411319984972714039, guid: 6f1545b84241b6847893807f808b4e2d, type: 3}
   Backgrounds:
   - Sprite: {fileID: 21300000, guid: f8a0a7b2a023ba34d974ffd49af15a3c, type: 3}
     BoardConfig:
-      RelativeSideOffset: 0.2
+      RelativeSideOffset: 0.1
       RelativeBottomOffset: 0.4
-    StartLevelId: 0
+    StartLevelId: 1
     EndLevelId: 3
