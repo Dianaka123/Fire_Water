@@ -1,11 +1,8 @@
 using Assets.Scripts.Managers.Interfaces;
-using Assets.Scripts.Services.Data;
 using Assets.Scripts.Services.Interfaces;
 using Cysharp.Threading.Tasks;
 using System.IO;
 using System.Threading;
-using System.Linq;
-using Unity.Plastic.Newtonsoft.Json;
 using UnityEngine;
 using Assets.Scripts.Configs;
 
@@ -22,7 +19,6 @@ namespace Assets.Scripts.Services
         {
             _levelManeger = levelManager;
             _converter = converter;
-
         }
 
         public async UniTask<Level> GetSavedDataAsync(CancellationToken cancellationToken)
@@ -39,7 +35,7 @@ namespace Assets.Scripts.Services
 
         public async UniTask SaveLevelStateAsync(CancellationToken cancellationToken)
         {
-            var json = _converter.SerializeLevel(_levelManeger.CurrentLevel);
+            var json = _converter.SerializeLevel(new Level() { LevelBlocksSequence = _levelManeger.CurrentLevelSequence });
             await File.WriteAllTextAsync(_savingPath, json);
         }
     }

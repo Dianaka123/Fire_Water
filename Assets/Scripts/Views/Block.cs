@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using System.Collections;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +9,8 @@ namespace Assets.Scripts.Views
     [RequireComponent(typeof(Animator))]
     public class Block : MonoBehaviour
     {
+        private static readonly int DestroyHash = Animator.StringToHash("Destroy");
+
         [SerializeField]
         private Animator _animator;
 
@@ -52,6 +55,16 @@ namespace Assets.Scripts.Views
                 gameObject.transform.localPosition = Vector3.Lerp(previousPosition, to, time / duration);
                 return time > duration;
             });
+        }
+    
+        public async UniTask DestroyAnimation(CancellationToken token)
+        {
+            await _animator.SetTriggerAsync(DestroyHash, token);
+        }
+
+        public void DestroyBlock()
+        {
+            Destroy(gameObject);
         }
     }
 }

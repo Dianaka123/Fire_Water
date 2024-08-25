@@ -1,5 +1,6 @@
 using Assets.Scripts.Configs;
-using Unity.Plastic.Newtonsoft.Json;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Assets.Scripts.Services
 {
@@ -14,7 +15,7 @@ namespace Assets.Scripts.Services
                 LevelBlocksSequence = ConvertTo1dArray(level.LevelBlocksSequence)
             };
 
-            return JsonConvert.SerializeObject(level);
+            return JsonConvert.SerializeObject(levelDesc);
         }
 
         public Level DeserializeLevel(string txt)
@@ -22,7 +23,7 @@ namespace Assets.Scripts.Services
             var deserializedData = JsonConvert.DeserializeObject<LevelDesc>(txt);
             var level2d = ConvertTo2D(deserializedData.LevelBlocksSequence, deserializedData.RowCount, deserializedData.ColumnCount);
 
-            return new Level() { LevelBlocksSequence = level2d,  Row = deserializedData.RowCount, Column = deserializedData.ColumnCount};
+            return new Level() { LevelBlocksSequence = level2d};
         }
 
         public Level[] DeserializeAllLevels(string txt)
@@ -39,8 +40,6 @@ namespace Assets.Scripts.Services
                 levels[i] = new Level()
                 {
                     LevelBlocksSequence = ConvertTo2D(levelDesc.LevelBlocksSequence, levelDesc.RowCount, levelDesc.ColumnCount),
-                    Row = levelDesc.RowCount,
-                    Column = levelDesc.ColumnCount,
                 };
             }
             return levels;
@@ -81,6 +80,5 @@ namespace Assets.Scripts.Services
 
             return arr;
         }
-
     }
 }

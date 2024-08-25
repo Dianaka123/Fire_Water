@@ -25,7 +25,7 @@ namespace Assets.Scripts.Managers
             return _currentGrid;
         }
 
-        public Vector2Int GetCellIndexByScreenPosition(Vector3 screenPosition)
+        public Vector2Int? GetCellIndexByScreenPosition(Vector3 screenPosition)
         {
             var position = TranslateToCanvasCoordinate(screenPosition);
             var column = _currentGrid.Indexes.GetLength(1);
@@ -44,7 +44,7 @@ namespace Assets.Scripts.Managers
                     }
                 }
             }
-            return Vector2Int.one * -1;
+            return null;
         }
 
         public Vector2 GetScreenPositionByCellIndex(Vector2Int cellIndex)

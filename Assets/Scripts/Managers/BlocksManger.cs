@@ -3,12 +3,16 @@ using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Data;
 using Assets.Scripts.Views;
 using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace Assets.Scripts.Managers
 {
     public class BlocksManger : IBlockManager
     {
+        private const float MoveDuration = 0.5f;
+
         private readonly GameResources _gameResources;
 
         private Block[,] _blocks;
@@ -44,36 +48,62 @@ namespace Assets.Scripts.Managers
 
         public async UniTask SwitchBlocksAsync(Vector2Int cellFrom, Vector2Int cellTo, Vector3 startPosition, Vector3 endPosition)
         {
-            MoveBlockAsync(cellFrom, endPosition).Forget();
-            MoveBlockAsync(cellTo, startPosition).Forget();
+            await UniTask.WhenAll(
+                MoveBlockAsync(cellFrom, endPosition),
+                MoveBlockAsync(cellTo, startPosition)
+            );
 
             var block1 = _blocks[cellFrom.x, cellFrom.y];
             var block2 = _blocks[cellTo.x, cellTo.y];
 
-            if(block2 != null && block1 != null)
-            {
-                var index1 = block1.SiblingIndex;
-                var index2 = block2.SiblingIndex;
-
-                block1.SiblingIndex = index2;
-                block2.SiblingIndex = index1;
-
-                Debug.Log($"{block1.SiblingIndex} + {block2.SiblingIndex}");
-            }
-
             _blocks[cellTo.x, cellTo.y] = block1;
             _blocks[cellFrom.x, cellFrom.y] = block2;
 
-            Debug.Log($"{_blocks[cellTo.x, cellTo.y].SiblingIndex} " +
-                $"+ {_blocks[cellFrom.x, cellFrom.y].SiblingIndex}");
+            UpdateSiblingIndices();
         }
+
+        public async UniTask DestroyAsync(Vector2Int[] indexes, CancellationToken token)
+        {
+            var animations = new List<UniTask>(indexes.Length);
+
+            foreach (var index in indexes)
+            {
+                animations.Add(_blocks[index.x, index.y].DestroyAnimation(token));
+            }
+
+            await UniTask.WhenAll(animations);
+
+            foreach (var index in indexes)
+            {
+                _blocks[index.x, index.y].DestroyBlock();
+                _blocks[index.x, index.y] = null;
+            }
+        }
+
 
         private async UniTask MoveBlockAsync(Vector2Int blockIndex, Vector3 to)
         {
             var block = _blocks[blockIndex.x, blockIndex.y];
             if (block != null)
             {
-                await block.AnimateMovingAsync(to, 0.5f);
+                await block.AnimateMovingAsync(to, MoveDuration);
+            }
+        }
+
+        private void UpdateSiblingIndices()
+        {
+            int counter = 0;
+            for (int i = 0; i < _blocks.GetLength(0); i++)
+            {
+                for (int j = 0; j < _blocks.GetLength(1); j++)
+                {
+                    var block = _blocks[i, j];
+                    if (block != null)
+                    {
+                        block.SiblingIndex = counter;
+                        counter++;
+                    }
+                }
             }
         }
     }

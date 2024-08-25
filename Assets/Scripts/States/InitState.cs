@@ -30,7 +30,7 @@ namespace Assets.Scripts.States
             var level = _levelManager.CurrentLevelSequence;
 
             _levelBuilder.BuildLevel(level);
-            GoTo(_playState, token).Forget();
+            await GoTo(_playState, token);
         }
 
         private async UniTask UpdateLevelStateBySavingData(CancellationToken token)

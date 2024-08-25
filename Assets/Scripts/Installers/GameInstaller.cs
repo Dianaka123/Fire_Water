@@ -19,6 +19,7 @@ namespace Assets.Scripts.Installers
             Container.BindInterfacesAndSelfTo<MoveBlocksManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<InputSystem>().AsSingle();
             Container.BindInterfacesAndSelfTo<LevelJsonConverter>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BoardNormalizer>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<SaveLevelService>().AsSingle();
             
@@ -32,6 +33,7 @@ namespace Assets.Scripts.Installers
 
             Container.Bind<InitState>().AsSingle();
             Container.Bind<PlayState>().AsSingle();
+            Container.Bind<LevelComplitedState>().AsSingle();
             Container.Bind<EmptyState>().AsSingle();
         }
     }

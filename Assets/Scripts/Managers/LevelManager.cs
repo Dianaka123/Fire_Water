@@ -15,7 +15,7 @@ namespace Assets.Scripts.Managers
         private readonly LevelJsonConverter _converter;
 
         public int[,] CurrentLevelSequence => _currentLevel.LevelBlocksSequence;
-        public HashSet<int> LevelBlocksType => _currentLevel.LevelBlocksType;
+        public int EmptyCellId => -1;
 
         private Level _currentLevel;
         private Level[] _levels;
@@ -32,6 +32,7 @@ namespace Assets.Scripts.Managers
         public void Initialize()
         {
             _levels = _converter.DeserializeAllLevels(_configuration.LevelsJSON.text);
+
             UpdateCurrentLevel(_levels[_levelId]);
         }
 
@@ -51,6 +52,19 @@ namespace Assets.Scripts.Managers
 
             UpdateCurrentLevel(_levels[_levelId]);
         }
+
+        public bool IsLevelCompleted()
+        {
+            foreach(var it in CurrentLevelSequence)
+            {
+                if(it != EmptyCellId)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        } 
 
         public void Dispose()
         {
@@ -72,9 +86,14 @@ namespace Assets.Scripts.Managers
             CurrentLevelSequence[to.x, to.y] = block1;
         }
 
+        public void SetEmptyCell(Vector2Int cellIndex)
+        {
+            CurrentLevelSequence[cellIndex.x, cellIndex.y] = EmptyCellId;
+        }
+
         public bool IsEmptyCell(Vector2Int cellIndex)
         {
-            return CurrentLevelSequence[cellIndex.x, cellIndex.y] == -1;
+            return CurrentLevelSequence[cellIndex.x, cellIndex.y] == EmptyCellId;
         }
     }
 }

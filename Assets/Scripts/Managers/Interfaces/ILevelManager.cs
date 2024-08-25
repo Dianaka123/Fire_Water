@@ -6,11 +6,15 @@ namespace Assets.Scripts.Managers.Interfaces
 {
     public interface ILevelManager
     {
-        public int[,] CurrentLevelSequence { get; }
-        HashSet<int> LevelBlocksType { get; }
+        int[,] CurrentLevelSequence { get; }
+        int EmptyCellId { get; }
+
 
         void UpdateLevelBySavingData(Level levelSavingData);
         void SwitchBlocks(Vector2Int from, Vector2Int to);
         bool IsEmptyCell(Vector2Int cellIndex);
+        void SetEmptyCell(Vector2Int cellIndex);
+        bool IsLevelCompleted();
+        void NextLevel();
     }
 }

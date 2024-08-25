@@ -2,12 +2,15 @@
 "levels":
 [
 	{
-	 "columnCount": 4,
-	 "rowCount": 2,
+	 "columnCount": 3,
+	 "rowCount": 5,
 	 "levelBlocksSequence" :
 	 						[
-							0, 1, -1, -1,
-							0, 0, 1, 1],
+							-1, -1, 1,
+							-1, -1, 0,
+							0, 0 ,1,
+							1, 1, 0, 
+							1, 1, 0],
 	 "backgroundId": 0
 	}
 ]
