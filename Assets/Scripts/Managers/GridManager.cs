@@ -9,11 +9,13 @@ namespace Assets.Scripts.Managers
     public class GridManager : IGridManager
     {
         private readonly IGridBuilder _gridBuilder;
-        private readonly ICanvasManger _canvasManger;
+        private readonly IUIManger _canvasManger;
 
         private GridData _currentGrid;
 
-        public GridManager(IGridBuilder gridBuilder, ICanvasManger canvasManger)
+        public GridData CurrentGrid => _currentGrid;
+
+        public GridManager(IGridBuilder gridBuilder, IUIManger canvasManger)
         {
             _gridBuilder = gridBuilder;
             _canvasManger = canvasManger;

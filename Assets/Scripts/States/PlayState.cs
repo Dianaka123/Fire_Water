@@ -2,6 +2,7 @@ using Assets.Scripts.Managers;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Interfaces;
 using Assets.Scripts.StateMachine;
+using Assets.Scripts.States.Contexts;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
@@ -15,24 +16,32 @@ namespace Assets.Scripts.States
         private readonly ILevelManager _levelManager;
         private readonly MoveBlocksManager _moveBlocksManager;
         private readonly IInputSystem _inputSystem;
-        private readonly LazyInject<LevelComplitedState> _levelComplitedState;
+        private readonly LazyInject<NextLevelState> _nextLevelState;
+        private readonly LazyInject<RestartLevelState> _restartLevelState;
+        private readonly IUIManger _uimanger;
 
         private bool _isInputEnabled;
 
         public PlayState(GridManager gridManager,IInputSystem inputSystem,
-            ISMContext context, MoveBlocksManager moveBlocksManager, ILevelManager levelManager, LazyInject<LevelComplitedState> levelComplitedState) : base(context)
+            GameSM context, MoveBlocksManager moveBlocksManager,
+            ILevelManager levelManager, LazyInject<NextLevelState> nextLevelState,
+            IUIManger uimanger, LazyInject<RestartLevelState> restartLevelState) : base(context)
         {
             _gridManager = gridManager;
             _inputSystem = inputSystem;
             _moveBlocksManager = moveBlocksManager;
             _levelManager = levelManager;
-            _levelComplitedState = levelComplitedState;
+            _nextLevelState = nextLevelState;
+            _uimanger = uimanger;
+            _restartLevelState = restartLevelState;
         }
-
 
         public override UniTask Enter(CancellationToken token)
         {
             _isInputEnabled = true;
+            _uimanger.Next += Next;
+            _uimanger.Restart += Restart;
+
             return base.Enter(token);
         }
 
@@ -66,8 +75,25 @@ namespace Assets.Scripts.States
 
             if (_levelManager.IsLevelCompleted())
             {
-                await GoTo(_levelComplitedState.Value, token);
+                GoTo(_nextLevelState.Value).Forget();
             }
+        }
+
+        public override UniTask Exit()
+        {
+            _uimanger.Restart -= Restart;
+            _uimanger.Next -= Next;
+            return base.Exit();
+        }
+
+        private void Restart()
+        {
+            GoTo(_restartLevelState.Value).Forget();
+        }
+
+        private async void Next()
+        {
+            GoTo(_nextLevelState.Value).Forget();
         }
 
         private async UniTask MoveAndReshuffle(Vector2Int from, Vector2Int to)

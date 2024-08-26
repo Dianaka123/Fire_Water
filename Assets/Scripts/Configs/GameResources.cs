@@ -10,6 +10,7 @@ namespace Assets.Scripts.Configs
     {
         public List<Block> Bloks;
         public List<BackgroundConfig> Backgrounds;
+        public BalloonConfig Balloon;
     }
 
     [Serializable]
@@ -17,6 +18,8 @@ namespace Assets.Scripts.Configs
     {
         public Sprite Sprite;
         public BoardConfig BoardConfig;
+        
+        //TODO: Constrain for min max
         public int StartLevelId;
         public int EndLevelId;
     }
@@ -28,5 +31,23 @@ namespace Assets.Scripts.Configs
         public float RelativeSideOffset;
         [Range(0, 1)]
         public float RelativeBottomOffset;
+    }
+
+    [Serializable]
+    public struct BalloonConfig
+    {
+        public List<Sprite> Sprites;
+        [Range(0, 10)]
+        public int TotalCount;
+
+        public BalloonView Prefab;
+
+        [Range(0, 1)]
+        public float RelativeSize;
+
+        //TODO: Constrain for min max
+        public float MinSpeed;
+        public float MaxSpeed;
+
     }
 }

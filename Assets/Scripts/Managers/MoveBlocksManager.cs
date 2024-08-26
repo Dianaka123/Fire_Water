@@ -27,7 +27,11 @@ namespace Assets.Scripts.Managers
 
         public async UniTask MoveBlockAsync(Vector2Int from, Vector2Int to)
         {
-            if(to.x >= _column || to.x < 0 || to.y < 0 || to.y >= _row || from == to)
+            if(to.x >= _column
+                || to.x < 0
+                || to.y < 0
+                || to.y >= _row
+                || from == to)
             {
                 return;
             }

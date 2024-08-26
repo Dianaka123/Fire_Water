@@ -16,10 +16,10 @@ namespace Assets.Scripts.StateMachine
             Context = context;
         }
 
-        public UniTask GoTo(IState state, CancellationToken token) => Context.GoTo(state, token);
-        public void Back(CancellationToken token) => Context.Back(token);
+        public UniTask GoTo(IState state, CancellationToken token = default) => Context.GoTo(state, token);
+        public void Back(CancellationToken token = default) => Context.Back(token);
 
-        public virtual UniTask Enter(CancellationToken token)
+        public virtual UniTask Enter(CancellationToken token = default)
         {
             _tokenSource = new CancellationTokenSource();
             token = _tokenSource.Token;
@@ -28,7 +28,8 @@ namespace Assets.Scripts.StateMachine
         }
 
         public abstract UniTask Run(CancellationToken token);
-        public virtual UniTask Exit(CancellationToken token)
+        
+        public virtual UniTask Exit()
         {
             _tokenSource.Cancel();
             _tokenSource.Dispose();

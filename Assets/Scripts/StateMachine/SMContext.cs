@@ -28,7 +28,7 @@ namespace Assets.Scripts.StateMachine
             await CurrentState.Run(token);
         }
 
-        public async UniTask GoTo(IState state, CancellationToken token)
+        public async UniTask GoTo(IState state, CancellationToken token = default)
         {
             _states.Push(state);
             await StateTransition(state, token);
@@ -53,7 +53,7 @@ namespace Assets.Scripts.StateMachine
             if (CurrentState != null)
             {
                 _stage = Stage.Exit;
-                await CurrentState.Exit(token);
+                await CurrentState.Exit();
             }
 
             CurrentState = newState;

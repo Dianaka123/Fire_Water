@@ -22,3 +22,12 @@ MonoBehaviour:
       RelativeBottomOffset: 0.2
     StartLevelId: 1
     EndLevelId: 3
+  Balloon:
+    Sprites:
+    - {fileID: 21300000, guid: 52bd41574116939429efe5788e39f447, type: 3}
+    - {fileID: 21300000, guid: ba33c887ef53095459037a717b7c1bb1, type: 3}
+    TotalCount: 3
+    Prefab: {fileID: 4505333282574644595, guid: 62f63ca0b8e02d74d8979573eab0d710, type: 3}
+    RelativeSize: 0.242
+    MinSpeed: 0.1
+    MaxSpeed: 1

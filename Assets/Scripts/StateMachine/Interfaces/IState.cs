@@ -10,6 +10,6 @@ namespace Assets.Scripts.StateMachine
 
         UniTask Run(CancellationToken token);
 
-        UniTask Exit(CancellationToken token);
+        UniTask Exit();
     }
 }

@@ -2,6 +2,7 @@ using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services;
 using Assets.Scripts.Services.Interfaces;
 using Assets.Scripts.StateMachine;
+using Assets.Scripts.States.Contexts;
 using Cysharp.Threading.Tasks;
 using System.Threading;
 
@@ -14,7 +15,7 @@ namespace Assets.Scripts.States
         private readonly ILevelManager _levelManager;
         private readonly PlayState _playState;
 
-        public InitState(ISMContext context, LevelBuilder levelBuilder,
+        public InitState(GameSM context, LevelBuilder levelBuilder,
             ISaveLevelService saveLevelService, ILevelManager levelManager,
             PlayState playState) : base(context)
         {

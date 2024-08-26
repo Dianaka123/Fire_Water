@@ -17,6 +17,7 @@ namespace Assets.Scripts.Installers
             Container.BindInterfacesAndSelfTo<GridManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<BlocksManger>().AsSingle();
             Container.BindInterfacesAndSelfTo<MoveBlocksManager>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BalloonManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<InputSystem>().AsSingle();
             Container.BindInterfacesAndSelfTo<LevelJsonConverter>().AsSingle();
             Container.BindInterfacesAndSelfTo<BoardNormalizer>().AsSingle();
@@ -29,12 +30,14 @@ namespace Assets.Scripts.Installers
         private void InstallStates()
         {
             Container.BindInterfacesAndSelfTo<GameSM>().AsSingle();
-            Container.BindInterfacesAndSelfTo<GameSMClient>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BallonSM>().AsSingle();
+            Container.BindInterfacesAndSelfTo<SMClient>().AsSingle();
 
             Container.Bind<InitState>().AsSingle();
             Container.Bind<PlayState>().AsSingle();
-            Container.Bind<LevelComplitedState>().AsSingle();
-            Container.Bind<EmptyState>().AsSingle();
+            Container.Bind<NextLevelState>().AsSingle();
+            Container.Bind<RestartLevelState>().AsSingle();
+            Container.Bind<BalloonsState>().AsSingle();
         }
     }
 }

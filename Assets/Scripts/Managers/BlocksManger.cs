@@ -25,7 +25,13 @@ namespace Assets.Scripts.Managers
 
         public void CreateBlocks(Array2D<int> level, GridData grid, Transform parent)
         {
-            _blocks = new Array2D<Block>(level.RowCount, level.ColumnCount);
+            ClearBlocks();
+
+            if(_blocks == null || _blocks?.Length != level.Length)
+            {
+                _blocks = new Array2D<Block>(level.RowCount, level.ColumnCount);
+            }
+
             float blockSize = grid.CellSize;
 
             level.ForEach(index =>
@@ -38,6 +44,13 @@ namespace Assets.Scripts.Managers
                     _blocks[index] = CreateBlock(index, blockPrefab, position, blockSize, parent);
                 }
             });
+        }
+
+        public void RestartLevel(Array2D<int> level, GridData grid, Transform parent)
+        {
+            ClearBlocks();
+
+            CreateBlocks(level, grid, parent);
         }
 
         public async UniTask SwitchBlocksAsync(Vector2Int cellFrom, Vector2Int cellTo, Vector3 startPosition, Vector3 endPosition)
@@ -69,6 +82,23 @@ namespace Assets.Scripts.Managers
                 _blocks[index].DestroyBlock();
                 _blocks[index] = null;
             }
+        }
+
+        private void ClearBlocks()
+        {
+            if(_blocks == null)
+            {
+                return;
+            }
+
+            _blocks.ForEach(index =>
+            {
+                if (_blocks[index] != null)
+                {
+                    _blocks[index].DestroyBlock();
+                    _blocks[index] = null;
+                }
+            });
         }
 
         private Block CreateBlock(Vector2Int index, Block blockPrefab, Vector2 position, float size, Transform parent)

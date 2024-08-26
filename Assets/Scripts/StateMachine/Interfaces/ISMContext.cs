@@ -7,9 +7,9 @@ namespace Assets.Scripts.StateMachine
     {
         IState CurrentState { get; }
 
-        UniTask Run(CancellationToken token);
+        UniTask Run(CancellationToken token = default);
 
-        UniTask GoTo(IState state, CancellationToken token);
-        UniTask Back(CancellationToken token);
+        UniTask GoTo(IState state, CancellationToken token = default);
+        UniTask Back(CancellationToken token = default);
     }
 }

@@ -2,7 +2,6 @@ using Assets.Scripts.Configs;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Interfaces;
 using Assets.Scripts.Wrappers;
-using Moq;
 using System;
 using System.Linq;
 using System.Threading;
@@ -47,12 +46,17 @@ namespace Assets.Scripts.Managers
         {
             var nextId = CurrentLevelId + 1;
 
-            if(CurrentLevelId >= _levels.Length)
+            if(nextId >= _levels.Length)
             {
                 nextId = 0;
             }
 
             UpdateCurrentLevel(_levels[nextId]);
+        }
+
+        public void RestartLevel()
+        {
+            UpdateCurrentLevel(_levels[CurrentLevelId]);
         }
 
         public bool IsLevelCompleted()

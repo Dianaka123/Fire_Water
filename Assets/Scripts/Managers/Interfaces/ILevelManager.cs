@@ -16,5 +16,6 @@ namespace Assets.Scripts.Managers.Interfaces
         void SetEmptyCell(Vector2Int cellIndex);
         bool IsLevelCompleted();
         void NextLevel();
+        void RestartLevel();
     }
 }
