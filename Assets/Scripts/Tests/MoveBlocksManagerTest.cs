@@ -1,5 +1,7 @@
 using Assets.Scripts.Managers;
 using Assets.Scripts.Managers.Interfaces;
+using Assets.Scripts.Services.Interfaces;
+using Assets.Scripts.Wrappers;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -14,11 +16,11 @@ namespace Assets.Scripts.Tests
 {
     public class MoveBlocksManagerTest: ZenjectUnitTestFixture
     {
-        private int[,] _levelSequence = new int[2,4]
+        private Array2D<int> _levelSequence = new Array2D<int>(new int[]
                 {
-                    {1, 1, -1, -1 },
-                    {0, 0, 0, 0 }
-                };
+                    1, 1, -1, -1,
+                    0, 0, 0, 0
+                }, 2, 4);
 
         private bool isLevelArraySwitchCalled;
         private bool isBlocksArraySwitchCalled;
@@ -50,14 +52,10 @@ namespace Assets.Scripts.Tests
 
             var levelManagerMock = new Mock<ILevelManager>();
             levelManagerMock.Setup(m => m.CurrentLevelSequence)
-                .Returns(new int[,]
-                {
-                    {1, 1, -1, -1 },
-                    {0, 0, 0, 0 }
-                });
+                .Returns(_levelSequence);
             levelManagerMock.Setup(m => m.IsEmptyCell(It.IsAny<Vector2Int>()))
                 .Returns<Vector2Int>((index) 
-                => _levelSequence[index.x, index.y] == -1);
+                => _levelSequence[index] == -1);
 
             levelManagerMock.Setup(m => m.SwitchBlocks(It.IsAny<Vector2Int>(), It.IsAny<Vector2Int>()))
                 .Callback(() => isLevelArraySwitchCalled = true);
@@ -69,6 +67,7 @@ namespace Assets.Scripts.Tests
             Container.Bind<ILevelManager>().FromInstance(levelManagerMock.Object);
             Container.Bind<IBlockManager>().FromInstance(blockManagerMock.Object);
             Container.Bind<IGridManager>().FromInstance(new Mock<IGridManager>().Object);
+            Container.Bind<IBoardNormalizer>().FromInstance(new Mock<IBoardNormalizer>().Object);
             Container.Bind<MoveBlocksManager>().AsSingle();
 
             Container.Inject(this);

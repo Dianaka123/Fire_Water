@@ -1,8 +1,10 @@
 using Assets.Scripts.Configs;
 using Assets.Scripts.Managers.Interfaces;
-using Assets.Scripts.Services;
+using Assets.Scripts.Services.Interfaces;
+using Assets.Scripts.Wrappers;
+using Moq;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using Zenject;
@@ -12,9 +14,9 @@ namespace Assets.Scripts.Managers
     public class LevelManager : ILevelManager, IInitializable, IDisposable
     {
         private readonly LevelsConfiguration _configuration;
-        private readonly LevelJsonConverter _converter;
+        private readonly ILevelJsonConverter _converter;
 
-        public int[,] CurrentLevelSequence => _currentLevel.LevelBlocksSequence;
+        public Array2D<int> CurrentLevelSequence => _currentLevel.LevelBlocksSequence;
         public int EmptyCellId => -1;
 
         private Level _currentLevel;
@@ -23,7 +25,7 @@ namespace Assets.Scripts.Managers
         
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
-        public LevelManager(LevelsConfiguration levelsConfiguration, LevelJsonConverter converter)
+        public LevelManager(LevelsConfiguration levelsConfiguration, ILevelJsonConverter converter)
         {
             _configuration = levelsConfiguration;
             _converter = converter;
@@ -55,15 +57,7 @@ namespace Assets.Scripts.Managers
 
         public bool IsLevelCompleted()
         {
-            foreach(var it in CurrentLevelSequence)
-            {
-                if(it != EmptyCellId)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return CurrentLevelSequence.Array1D.All(x => x == EmptyCellId);
         } 
 
         public void Dispose()
@@ -74,26 +68,29 @@ namespace Assets.Scripts.Managers
 
         private void UpdateCurrentLevel(Level level)
         {
-            _currentLevel = level;
+            _currentLevel = new Level()
+            {
+                LevelBlocksSequence = level.LevelBlocksSequence.Clone(),
+            };
         }
 
         public void SwitchBlocks(Vector2Int from, Vector2Int to)
         {
-            var block1 = CurrentLevelSequence[from.x, from.y];
-            var block2 = CurrentLevelSequence[to.x, to.y];
+            var block1 = CurrentLevelSequence[from];
+            var block2 = CurrentLevelSequence[to];
 
-            CurrentLevelSequence[from.x, from.y] = block2;
-            CurrentLevelSequence[to.x, to.y] = block1;
+            CurrentLevelSequence[from] = block2;
+            CurrentLevelSequence[to] = block1;
         }
 
         public void SetEmptyCell(Vector2Int cellIndex)
         {
-            CurrentLevelSequence[cellIndex.x, cellIndex.y] = EmptyCellId;
+            CurrentLevelSequence[cellIndex] = EmptyCellId;
         }
 
         public bool IsEmptyCell(Vector2Int cellIndex)
         {
-            return CurrentLevelSequence[cellIndex.x, cellIndex.y] == EmptyCellId;
+            return CurrentLevelSequence[cellIndex] == EmptyCellId;
         }
     }
 }

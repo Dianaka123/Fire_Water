@@ -6,11 +6,11 @@ namespace Assets.Scripts.Extensions
 {
     public static class AnimatorExtensions
     {
-        public static async UniTask SetTriggerAsync(this Animator animator, int id, CancellationToken cancellationToken = default)
+        public static async UniTask SetTriggerAsync(this Animator animator, int id, MonoBehaviour monoBehaviour)
         {
             animator.SetTrigger(id);
             
-            await UniTask.Yield(cancellationToken);
+            await UniTask.WaitForEndOfFrame(monoBehaviour);
 
             await UniTask.WaitUntil(() =>
             {

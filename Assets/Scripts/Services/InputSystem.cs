@@ -1,4 +1,3 @@
-using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Interfaces;
 using UnityEngine;
 
@@ -17,6 +16,7 @@ namespace Assets.Scripts.Services
         private Touch? _initialTouch;
         private bool _swiping;
 
+        //TODO: move to config
         private float minSwipeDistance = 1;
         private float errorRange = 100;
 
@@ -44,6 +44,11 @@ namespace Assets.Scripts.Services
                 }
                 else if (touch.phase == TouchPhase.Ended)
                 {
+                    if(!_initialTouch.HasValue)
+                    { 
+                        return null;
+                    }
+
                     var result = new SwipeState()
                     {
                         Direction = _direction,

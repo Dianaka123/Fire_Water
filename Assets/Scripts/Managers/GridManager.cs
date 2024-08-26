@@ -28,28 +28,30 @@ namespace Assets.Scripts.Managers
         public Vector2Int? GetCellIndexByScreenPosition(Vector3 screenPosition)
         {
             var position = TranslateToCanvasCoordinate(screenPosition);
-            var column = _currentGrid.Indexes.GetLength(1);
-            var row = _currentGrid.Indexes.GetLength(0);
+            
+            var row = _currentGrid.Indexes.RowCount;
+            var column = _currentGrid.Indexes.ColumnCount;
+
             var halfCellSize = _currentGrid.CellSize / 2;
 
-            for (int i = 0; i < row; i++)
+            Vector2Int? cellIndex = null;
+            
+            _currentGrid.Indexes.ForEach(index =>
             {
-                for(int j = 0; j < column; j++)
+                var cellPosition = _currentGrid.Indexes[index];
+                if ((cellPosition.x - halfCellSize < position.x && position.x < cellPosition.x + halfCellSize)
+                    && (cellPosition.y - halfCellSize < position.y && position.y < cellPosition.y + halfCellSize))
                 {
-                    var cellPosition = _currentGrid.Indexes[i, j];
-                    if ((cellPosition.x - halfCellSize < position.x && position.x < cellPosition.x + halfCellSize)
-                        && (cellPosition.y - halfCellSize < position.y && position.y < cellPosition.y + halfCellSize))
-                    {
-                        return new Vector2Int(i, j);
-                    }
+                    cellIndex = index;
                 }
-            }
-            return null;
+            });
+                   
+            return cellIndex;
         }
 
         public Vector2 GetScreenPositionByCellIndex(Vector2Int cellIndex)
         {
-            return _currentGrid.Indexes[cellIndex.x, cellIndex.y];
+            return _currentGrid.Indexes[cellIndex];
         }
 
         private Vector2 TranslateToCanvasCoordinate(Vector3 screenPosition)

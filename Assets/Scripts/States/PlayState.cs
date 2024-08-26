@@ -17,7 +17,7 @@ namespace Assets.Scripts.States
         private readonly IInputSystem _inputSystem;
         private readonly LazyInject<LevelComplitedState> _levelComplitedState;
 
-        private UniTask? _animationTask;
+        private bool _isInputEnabled;
 
         public PlayState(GridManager gridManager,IInputSystem inputSystem,
             ISMContext context, MoveBlocksManager moveBlocksManager, ILevelManager levelManager, LazyInject<LevelComplitedState> levelComplitedState) : base(context)
@@ -29,9 +29,16 @@ namespace Assets.Scripts.States
             _levelComplitedState = levelComplitedState;
         }
 
+
+        public override UniTask Enter(CancellationToken token)
+        {
+            _isInputEnabled = true;
+            return base.Enter(token);
+        }
+
         public override async UniTask Run(CancellationToken token)
         {
-            if(_animationTask != null && _animationTask.Value.Status != UniTaskStatus.Succeeded)
+            if(!_isInputEnabled)
             {
                 return;
             }
@@ -55,15 +62,21 @@ namespace Assets.Scripts.States
 
             var nextCell = startIndex.Value + step;
 
-            _animationTask = _moveBlocksManager.MoveBlockAsync(startIndex.Value, nextCell)
-                .ContinueWith(() => _moveBlocksManager.Reshuffle(token));
-
-            //await _animationTask.Value;
+            await MoveAndReshuffle(startIndex.Value, nextCell);
 
             if (_levelManager.IsLevelCompleted())
             {
                 await GoTo(_levelComplitedState.Value, token);
             }
+        }
+
+        private async UniTask MoveAndReshuffle(Vector2Int from, Vector2Int to)
+        {
+            _isInputEnabled = false;
+            await _moveBlocksManager.MoveBlockAsync(from, to);
+            await _moveBlocksManager.CheckFallBlocksAsync();
+            await _moveBlocksManager.ReshuffleAsync();
+            _isInputEnabled = true;
         }
 
         private Vector2Int GetStepByDirection(Direction direction)
@@ -73,16 +86,16 @@ namespace Assets.Scripts.States
             switch (direction)
             {
                 case Direction.Up:
-                    step.x = 1;
-                    break;
-                case Direction.Down:
-                    step.x = -1;
-                    break;
-                case Direction.Right:
                     step.y = 1;
                     break;
-                case Direction.Left:
+                case Direction.Down:
                     step.y = -1;
+                    break;
+                case Direction.Right:
+                    step.x = 1;
+                    break;
+                case Direction.Left:
+                    step.x = -1;
                     break;
             }
 

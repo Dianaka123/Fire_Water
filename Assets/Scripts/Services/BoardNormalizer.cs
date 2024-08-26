@@ -1,4 +1,6 @@
 using Assets.Scripts.Services.Interfaces;
+using Assets.Scripts.Wrappers;
+using Codice.Client.BaseCommands.BranchExplorer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,55 +19,50 @@ namespace Assets.Scripts.Services
             public int VerticalCounter;
         }
 
-        public Vector2Int[] GetBlockSequenceForDestroying(int[,] levelSequence, int emptyCellId)
+        public Vector2Int[] GetBlockSequenceForDestroying(Array2D<int> levelSequence, int emptyCellId)
         {
             var result = new HashSet<Vector2Int>();
             var visitedIndexes = new HashSet<Vector2Int>();
-            for (var i = 0; i < levelSequence.GetLength(0); i++)
+            levelSequence.ForEach(index =>
             {
-                for (var j = 0; j < levelSequence.GetLength(1); j++)
+                var currentIndex = index;
+                if (levelSequence[index] == emptyCellId || visitedIndexes.Contains(currentIndex))
                 {
-                    var currentIndex = new Vector2Int(i, j);
-                    if (levelSequence[i, j] == emptyCellId || visitedIndexes.Contains(currentIndex))
-                    {
-                        continue;
-                    }
-                    Debug.Log("-----------");
-                    var startSequence = new Sequence() { HorizontalCounter = 1, VerticalCounter = 1, VisitedIndexes = new() };
+                    return;
+                }
 
-                    var resultSequence = FindSequence(levelSequence, i, j, levelSequence[i, j], startSequence, 0, 0);
+                var startSequence = new Sequence() { HorizontalCounter = 1, VerticalCounter = 1, VisitedIndexes = new() };
 
-                    foreach (var index in resultSequence.VisitedIndexes)
-                    {
-                        visitedIndexes.Add(index);
-                    }
+                var resultSequence = FindSequence(levelSequence, index, levelSequence[index], startSequence, 0, 0);
 
-                    if (resultSequence.HorizontalCounter >= MinMatchCount || resultSequence.VerticalCounter >= MinMatchCount)
+                foreach (var cell in resultSequence.VisitedIndexes)
+                {
+                    visitedIndexes.Add(cell);
+                }
+
+                if (resultSequence.HorizontalCounter >= MinMatchCount || resultSequence.VerticalCounter >= MinMatchCount)
+                {
+                    foreach (var cell in resultSequence.VisitedIndexes)
                     {
-                        foreach(var index in resultSequence.VisitedIndexes)
-                        {
-                            result.Add(index);
-                        }
+                        result.Add(cell);
                     }
                 }
-            }
+            });
 
             return result.ToArray();
         }
 
-        private Sequence FindSequence(int[,] levelSequence, int x, int y, int value, Sequence sequence, int h, int v)
+        private Sequence FindSequence(Array2D<int> levelSequence, Vector2Int index, int value, Sequence sequence, int h, int v)
         {
-            if(y < 0 
-                || x < 0 
-                || y >= levelSequence.GetLength(1) 
-                || x >= levelSequence.GetLength(0)
-                || levelSequence[x, y] != value
-                || sequence.VisitedIndexes.Contains(new Vector2Int(x, y)))
+            if(index.y < 0 
+                || index.x < 0 
+                || index.y >= levelSequence.RowCount 
+                || index.x >= levelSequence.ColumnCount
+                || levelSequence[index] != value
+                || sequence.VisitedIndexes.Contains(index))
             {
                 return sequence;
             }
-
-            //Debug.Log($"{x} - {y}");
 
             sequence = new Sequence()
             {
@@ -74,34 +71,34 @@ namespace Assets.Scripts.Services
                 VerticalCounter = sequence.VerticalCounter + v
             };
 
-            sequence.VisitedIndexes.Add(new Vector2Int(x, y));
+            sequence.VisitedIndexes.Add(index);
 
-            var left = y - 1;
-            var leftSeq = FindSequence(levelSequence, x, left, value, new Sequence()
+            var left = index + Vector2Int.left;
+            var leftSeq = FindSequence(levelSequence, left, value, new Sequence()
             {
                 VisitedIndexes = sequence.VisitedIndexes,
                 HorizontalCounter = sequence.HorizontalCounter,
                 VerticalCounter = 1,
             }, 1, 0);
             
-            var right = y + 1;
-            var rightSeq = FindSequence(levelSequence, x, right, value, new Sequence()
+            var right = index + Vector2Int.right;
+            var rightSeq = FindSequence(levelSequence, right, value, new Sequence()
             {
                 VisitedIndexes = sequence.VisitedIndexes,
                 HorizontalCounter = sequence.HorizontalCounter,
                 VerticalCounter = 1,
             }, 1, 0);
 
-            var top = x + 1;
-            var topSeq = FindSequence(levelSequence, top, y, value, new Sequence()
+            var top = index + Vector2Int.up;
+            var topSeq = FindSequence(levelSequence, top, value, new Sequence()
             {
                 VisitedIndexes = sequence.VisitedIndexes,
                 HorizontalCounter = 1,
                 VerticalCounter = sequence.VerticalCounter,
             }, 0, 1);
 
-            var bottom = x - 1;
-            var bottomSeq = FindSequence(levelSequence, bottom, y, value, new Sequence()
+            var bottom = index + Vector2Int.down;
+            var bottomSeq = FindSequence(levelSequence, bottom, value, new Sequence()
             {
                 VisitedIndexes = sequence.VisitedIndexes,
                 HorizontalCounter = 1,

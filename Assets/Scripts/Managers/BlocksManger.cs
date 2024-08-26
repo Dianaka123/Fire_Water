@@ -2,6 +2,7 @@ using Assets.Scripts.Configs;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Data;
 using Assets.Scripts.Views;
+using Assets.Scripts.Wrappers;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Threading;
@@ -15,75 +16,81 @@ namespace Assets.Scripts.Managers
 
         private readonly GameResources _gameResources;
 
-        private Block[,] _blocks;
+        private Array2D<Block> _blocks;
 
         public BlocksManger(GameResources gameResources)
         {
             _gameResources = gameResources;
         }
 
-        public void CreateBlocks(int[,] level, GridData grid, Transform parent)
+        public void CreateBlocks(Array2D<int> level, GridData grid, Transform parent)
         {
-            var row = grid.Indexes.GetLength(0);
-            var column = grid.Indexes.GetLength(1);
-            _blocks = new Block[row, column];
+            _blocks = new Array2D<Block>(level.RowCount, level.ColumnCount);
+            float blockSize = grid.CellSize;
 
-            for (int i = 0; i < row; i++)
+            level.ForEach(index =>
             {
-                for (int j = 0; j < column; j++)
+                var blockValue = level[index];
+                if (blockValue >= 0)
                 {
-                    var blockIndex = level[i, j];
-                    if (blockIndex >= 0)
-                    {
-                        var position = grid.Indexes[i, j];
-                        var block = GameObject.Instantiate(_gameResources.Bloks[blockIndex], parent);
-                        block.transform.localPosition = position;
-                        block.SetSize(grid.CellSize);
-
-                        _blocks[i, j] = block;
-                    }
+                    var position = grid.Indexes[index.x, index.y];
+                    var blockPrefab = _gameResources.Bloks[blockValue];
+                    _blocks[index] = CreateBlock(index, blockPrefab, position, blockSize, parent);
                 }
-            }
+            });
         }
 
         public async UniTask SwitchBlocksAsync(Vector2Int cellFrom, Vector2Int cellTo, Vector3 startPosition, Vector3 endPosition)
         {
-            await UniTask.WhenAll(
-                MoveBlockAsync(cellFrom, endPosition),
-                MoveBlockAsync(cellTo, startPosition)
-            );
+            await SwitchBlocksAnimationAsync(cellFrom, cellTo, startPosition, endPosition);
 
-            var block1 = _blocks[cellFrom.x, cellFrom.y];
-            var block2 = _blocks[cellTo.x, cellTo.y];
+            var block1 = _blocks[cellFrom];
+            var block2 = _blocks[cellTo];
 
-            _blocks[cellTo.x, cellTo.y] = block1;
-            _blocks[cellFrom.x, cellFrom.y] = block2;
+            _blocks[cellTo] = block1;
+            _blocks[cellFrom] = block2;
 
             UpdateSiblingIndices();
         }
 
-        public async UniTask DestroyAsync(Vector2Int[] indexes, CancellationToken token)
+        public async UniTask DestroyAsync(Vector2Int[] indexes)
         {
             var animations = new List<UniTask>(indexes.Length);
 
             foreach (var index in indexes)
             {
-                animations.Add(_blocks[index.x, index.y].DestroyAnimation(token));
+                animations.Add(_blocks[index].DestroyAnimation());
             }
 
             await UniTask.WhenAll(animations);
 
             foreach (var index in indexes)
             {
-                _blocks[index.x, index.y].DestroyBlock();
-                _blocks[index.x, index.y] = null;
+                _blocks[index].DestroyBlock();
+                _blocks[index] = null;
             }
         }
 
-
-        private async UniTask MoveBlockAsync(Vector2Int blockIndex, Vector3 to)
+        private Block CreateBlock(Vector2Int index, Block blockPrefab, Vector2 position, float size, Transform parent)
         {
-            var block = _blocks[blockIndex.x, blockIndex.y];
+            var block = GameObject.Instantiate(blockPrefab, parent);
+            block.transform.localPosition = position;
+            block.SetSize(size);
+
+            return block;
+        }
+
+        private UniTask SwitchBlocksAnimationAsync(Vector2Int cellFrom, Vector2Int cellTo, Vector3 startPosition, Vector3 endPosition)
+        {
+            return UniTask.WhenAll(
+                MoveBlockAnimationAsync(cellFrom, endPosition),
+                MoveBlockAnimationAsync(cellTo, startPosition)
+            );
+        }
+
+        private async UniTask MoveBlockAnimationAsync(Vector2Int blockIndex, Vector3 to)
+        {
+            var block = _blocks[blockIndex];
             if (block != null)
             {
                 await block.AnimateMovingAsync(to, MoveDuration);
@@ -93,18 +100,16 @@ namespace Assets.Scripts.Managers
         private void UpdateSiblingIndices()
         {
             int counter = 0;
-            for (int i = 0; i < _blocks.GetLength(0); i++)
+            _blocks.ForEach(index =>
             {
-                for (int j = 0; j < _blocks.GetLength(1); j++)
+                var block = _blocks[index];
+                if (block != null)
                 {
-                    var block = _blocks[i, j];
-                    if (block != null)
-                    {
-                        block.SiblingIndex = counter;
-                        counter++;
-                    }
+                    block.SiblingIndex = counter;
+                    counter++;
                 }
-            }
+            });
+                    
         }
     }
 }

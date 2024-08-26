@@ -1,7 +1,9 @@
+using Assets.Scripts.Wrappers;
+
 namespace Assets.Scripts.Configs
 {
     public class Level
     {
-        public int[,] LevelBlocksSequence;
+        public Array2D<int> LevelBlocksSequence;
     }
 }

@@ -1,12 +1,12 @@
 ﻿using Assets.Scripts.Configs;
-using System.Collections.Generic;
+using Assets.Scripts.Wrappers;
 using UnityEngine;
 
 namespace Assets.Scripts.Managers.Interfaces
 {
     public interface ILevelManager
     {
-        int[,] CurrentLevelSequence { get; }
+        Array2D<int> CurrentLevelSequence { get; }
         int EmptyCellId { get; }
 
 

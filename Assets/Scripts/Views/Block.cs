@@ -57,9 +57,9 @@ namespace Assets.Scripts.Views
             });
         }
     
-        public async UniTask DestroyAnimation(CancellationToken token)
+        public async UniTask DestroyAnimation()
         {
-            await _animator.SetTriggerAsync(DestroyHash, token);
+            await _animator.SetTriggerAsync(DestroyHash, this);
         }
 
         public void DestroyBlock()

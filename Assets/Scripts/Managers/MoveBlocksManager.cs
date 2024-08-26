@@ -14,8 +14,8 @@ namespace Assets.Scripts.Managers
         private readonly IBlockManager _blocksManger;
         private readonly IBoardNormalizer _boardNormalizer;
 
-        private int _row => _levelManager.CurrentLevelSequence.GetLength(0);
-        private int _column => _levelManager.CurrentLevelSequence.GetLength(1);
+        private int _row => _levelManager.CurrentLevelSequence.RowCount;
+        private int _column => _levelManager.CurrentLevelSequence.ColumnCount;
 
         public MoveBlocksManager(ILevelManager levelManager, IBlockManager blocksManger, IGridManager gridManager, IBoardNormalizer boardNormalizer)
         {
@@ -27,12 +27,12 @@ namespace Assets.Scripts.Managers
 
         public async UniTask MoveBlockAsync(Vector2Int from, Vector2Int to)
         {
-            if(to.x >= _row || to.x < 0 || to.y < 0 || to.y >= _column || from == to)
+            if(to.x >= _column || to.x < 0 || to.y < 0 || to.y >= _row || from == to)
             {
                 return;
             }
 
-            var isUp = (to - from).x > 0;
+            var isUp = (to - from).y > 0;
 
             if (_levelManager.IsEmptyCell(from) 
                 || (isUp && _levelManager.IsEmptyCell(to)))
@@ -48,7 +48,7 @@ namespace Assets.Scripts.Managers
             await _blocksManger.SwitchBlocksAsync(from, to, startPosition, endPosition);
         }
 
-        public async UniTask Reshuffle(CancellationToken token)
+        public async UniTask ReshuffleAsync()
         {
             var indexesToDestroy = _boardNormalizer.GetBlockSequenceForDestroying(_levelManager.CurrentLevelSequence, _levelManager.EmptyCellId);
             
@@ -57,32 +57,37 @@ namespace Assets.Scripts.Managers
                 return;
             }
 
-            await _blocksManger.DestroyAsync(indexesToDestroy, token);
+            await _blocksManger.DestroyAsync(indexesToDestroy);
 
             foreach( var index in indexesToDestroy)
             {
                 _levelManager.SetEmptyCell(index);
             }
 
+            await CheckFallBlocksAsync();
+
+            await ReshuffleAsync();
+        }
+
+        public async UniTask CheckFallBlocksAsync()
+        {
             var levelSequence = _levelManager.CurrentLevelSequence;
             var animations = new List<UniTask>();
-            for ( var j = 0; j < levelSequence.GetLength(1); j++)
+            for (var x = 0; x < levelSequence.ColumnCount; x++)
             {
                 var currentBottom = 0;
-                for (var i = 0; i < levelSequence.GetLength(0); i++)
+                for (var y = 0; y < levelSequence.RowCount; y++)
                 {
-                    var value = levelSequence[i, j];
-                    if(value != _levelManager.EmptyCellId)
+                    var value = levelSequence[x, y];
+                    if (value != _levelManager.EmptyCellId)
                     {
-                        animations.Add(MoveBlockAsync(new Vector2Int(i,j), new Vector2Int(currentBottom,j)));
+                        animations.Add(MoveBlockAsync(new Vector2Int(x, y), new Vector2Int(x, currentBottom)));
                         currentBottom++;
                     }
                 }
             }
 
             await UniTask.WhenAll(animations);
-
-            await Reshuffle(token);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Assets.Scripts.Tests
         [TestCase(2, 4, 0.2f, 0.4f, -15, -5)]
         public void GridBuilder_CreateBoardForLevel_BottomIndexShouldBeCentralized(int rows, int columns, float sideOffset, float bottomOffset, float x, float y)
         {
-            var gridSize = new Vector2Int(rows, columns);
+            var gridSize = new Vector2Int(columns, rows);
             var boardConfig = new BoardConfig()
             {
                 RelativeSideOffset = sideOffset,

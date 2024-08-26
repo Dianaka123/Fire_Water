@@ -1,18 +1,19 @@
 using Assets.Scripts.Configs;
+using Assets.Scripts.Services.Interfaces;
+using Assets.Scripts.Wrappers;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 
 namespace Assets.Scripts.Services
 {
-    public class LevelJsonConverter
+    public class LevelJsonConverter : ILevelJsonConverter
     {
         public string SerializeLevel(Level level)
         {
             var levelDesc = new LevelDesc()
             {
-                RowCount = level.LevelBlocksSequence.GetLength(0),
-                ColumnCount = level.LevelBlocksSequence.GetLength(1),
-                LevelBlocksSequence = ConvertTo1dArray(level.LevelBlocksSequence)
+                RowCount = level.LevelBlocksSequence.RowCount,
+                ColumnCount = level.LevelBlocksSequence.ColumnCount,
+                LevelBlocksSequence = level.LevelBlocksSequence.Array1D,
             };
 
             return JsonConvert.SerializeObject(levelDesc);
@@ -21,7 +22,7 @@ namespace Assets.Scripts.Services
         public Level DeserializeLevel(string txt)
         {
             var deserializedData = JsonConvert.DeserializeObject<LevelDesc>(txt);
-            var level2d = ConvertTo2D(deserializedData.LevelBlocksSequence, deserializedData.RowCount, deserializedData.ColumnCount);
+            var level2d = new Array2D<int>(deserializedData.LevelBlocksSequence, deserializedData.RowCount, deserializedData.ColumnCount);
 
             return new Level() { LevelBlocksSequence = level2d};
         }
@@ -36,44 +37,29 @@ namespace Assets.Scripts.Services
             for (int i = 0; i < levelCount; i++)
             {
                 var levelDesc = levelDescs[i];
+                var rowCount = levelDesc.RowCount;
+                var columnCount = levelDesc.ColumnCount;
 
+                var levelSequence = ConvertArray(levelDesc.LevelBlocksSequence, rowCount, columnCount);
                 levels[i] = new Level()
                 {
-                    LevelBlocksSequence = ConvertTo2D(levelDesc.LevelBlocksSequence, levelDesc.RowCount, levelDesc.ColumnCount),
+                    LevelBlocksSequence = new Array2D<int>(levelSequence, rowCount, columnCount)
                 };
-            }
+            };
+
             return levels;
         }
 
-        private int[,] ConvertTo2D(int[] levelSequence, int rows, int columns)
+        private int[] ConvertArray(int[] configLevelSequence, int rows, int columns)
         {
-            var arr2d = new int[rows, columns];
+            var arr = new int[configLevelSequence.Length];
             var index = 0;
+
             for (var i = rows - 1; i >= 0; i--)
             {
-                for(var j = 0; j < columns; j++)
+                for (var j = 0; j < columns; j++)
                 {
-                    arr2d[i,j] = levelSequence[index];
-                    index++;
-                }
-            }
-
-            return arr2d;
-        }
-
-        private int[] ConvertTo1dArray(int[,] arr2d)
-        {
-            var arr = new int[arr2d.Length];
-
-            var rows = arr2d.GetLength(0);
-            var columns = arr2d.GetLength(1);
-
-            var index = 0;
-            for (int i = rows - 1; i >= 0; i--)
-            {
-                for(int j = 0; j < columns; j++)
-                {
-                    arr[index] = arr2d[i, j];
+                    arr[i * columns + j] = configLevelSequence[index];
                     index++;
                 }
             }
