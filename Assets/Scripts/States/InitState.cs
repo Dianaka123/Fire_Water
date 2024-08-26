@@ -27,9 +27,8 @@ namespace Assets.Scripts.States
         public async override UniTask Run(CancellationToken token)
         {
             await UpdateLevelStateBySavingData(token);
-            var level = _levelManager.CurrentLevelSequence;
 
-            _levelBuilder.BuildLevel(level);
+            _levelBuilder.BuildLevel(_levelManager.CurrentLevelSequence);
             await GoTo(_playState, token);
         }
 

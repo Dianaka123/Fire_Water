@@ -1,9 +1,8 @@
 using Cysharp.Threading.Tasks;
-using System;
 using System.Threading;
 using UnityEngine;
 
-namespace Assets.Scripts
+namespace Assets.Scripts.Extensions
 {
     public static class AnimatorExtensions
     {

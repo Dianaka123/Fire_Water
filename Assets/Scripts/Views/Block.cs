@@ -1,5 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
-using System.Collections;
+﻿using Assets.Scripts.Extensions;
+using Cysharp.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
