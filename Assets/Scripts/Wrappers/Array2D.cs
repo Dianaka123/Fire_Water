@@ -6,14 +6,14 @@ namespace Assets.Scripts.Wrappers
 {
     public class Array2D<T>
     {
-        public int RowCount {  get; }
+        public int RowCount { get; }
         public int ColumnCount { get; }
 
         public int Length => Array1D.Length;
         public Vector2Int Size { get; }
-        public T[] Array1D {  get; }
+        public T[] Array1D { get; }
 
-        public Array2D(T[] array,int rowCount, int columnCount)
+        public Array2D(T[] array, int rowCount, int columnCount)
         {
             Array1D = array;
             RowCount = rowCount;
@@ -38,7 +38,7 @@ namespace Assets.Scripts.Wrappers
 
         public T this[int x, int y]
         {
-            get => Array1D[GetRawIndex(x,y)];
+            get => Array1D[GetRawIndex(x, y)];
             set => Array1D[GetRawIndex(x, y)] = value;
         }
 
@@ -52,20 +52,9 @@ namespace Assets.Scripts.Wrappers
         {
             for (int y = 0; y < RowCount; y++)
             {
-                for(int x = 0; x < ColumnCount; x++)
-                {
-                    action(new Vector2Int(x, y));
-                }
-            }
-        }
-
-        public void ForEach(Action<T> action)
-        {
-            for (int y = 0; y < RowCount; y++)
-            {
                 for (int x = 0; x < ColumnCount; x++)
                 {
-                    action(this[x, y]);
+                    action(new Vector2Int(x, y));
                 }
             }
         }

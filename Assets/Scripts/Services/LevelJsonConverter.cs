@@ -1,4 +1,5 @@
 using Assets.Scripts.Configs;
+using Assets.Scripts.Services.Data;
 using Assets.Scripts.Services.Interfaces;
 using Assets.Scripts.Wrappers;
 using Newtonsoft.Json;
@@ -16,15 +17,15 @@ namespace Assets.Scripts.Services
                 LevelBlocksSequence = level.LevelBlocksSequence.Array1D,
             };
 
-            return JsonConvert.SerializeObject(levelDesc);
+            return JsonConvert.SerializeObject(new LevelSavingData() { LevelDesc = levelDesc, LevelId = level.LevelId });
         }
 
         public Level DeserializeLevel(string txt)
         {
-            var deserializedData = JsonConvert.DeserializeObject<LevelDesc>(txt);
-            var level2d = new Array2D<int>(deserializedData.LevelBlocksSequence, deserializedData.RowCount, deserializedData.ColumnCount);
+            var deserializedData = JsonConvert.DeserializeObject<LevelSavingData>(txt);
+            var level2d = new Array2D<int>(deserializedData.LevelDesc.LevelBlocksSequence, deserializedData.LevelDesc.RowCount, deserializedData.LevelDesc.ColumnCount);
 
-            return new Level() { LevelBlocksSequence = level2d};
+            return new Level() { LevelBlocksSequence = level2d, LevelId = deserializedData.LevelId};
         }
 
         public Level[] DeserializeAllLevels(string txt)
@@ -43,7 +44,8 @@ namespace Assets.Scripts.Services
                 var levelSequence = ConvertArray(levelDesc.LevelBlocksSequence, rowCount, columnCount);
                 levels[i] = new Level()
                 {
-                    LevelBlocksSequence = new Array2D<int>(levelSequence, rowCount, columnCount)
+                    LevelBlocksSequence = new Array2D<int>(levelSequence, rowCount, columnCount),
+                    LevelId = i,
                 };
             };
 

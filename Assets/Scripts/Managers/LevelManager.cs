@@ -17,11 +17,11 @@ namespace Assets.Scripts.Managers
         private readonly ILevelJsonConverter _converter;
 
         public Array2D<int> CurrentLevelSequence => _currentLevel.LevelBlocksSequence;
+        public int CurrentLevelId => _currentLevel.LevelId;
         public int EmptyCellId => -1;
 
         private Level _currentLevel;
         private Level[] _levels;
-        private int _levelId = 0;
         
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
@@ -35,7 +35,7 @@ namespace Assets.Scripts.Managers
         {
             _levels = _converter.DeserializeAllLevels(_configuration.LevelsJSON.text);
 
-            UpdateCurrentLevel(_levels[_levelId]);
+            UpdateCurrentLevel(_levels[0]);
         }
 
         public void UpdateLevelBySavingData(Level level)
@@ -45,14 +45,14 @@ namespace Assets.Scripts.Managers
 
         public void NextLevel()
         {
-            _levelId++;
+            var nextId = CurrentLevelId + 1;
 
-            if(_levelId >= _levels.Length)
+            if(CurrentLevelId >= _levels.Length)
             {
-                _levelId = 0;
+                nextId = 0;
             }
 
-            UpdateCurrentLevel(_levels[_levelId]);
+            UpdateCurrentLevel(_levels[nextId]);
         }
 
         public bool IsLevelCompleted()
@@ -60,17 +60,12 @@ namespace Assets.Scripts.Managers
             return CurrentLevelSequence.Array1D.All(x => x == EmptyCellId);
         } 
 
-        public void Dispose()
-        {
-            _cancellationTokenSource.Cancel();
-            _cancellationTokenSource.Dispose();
-        }
-
         private void UpdateCurrentLevel(Level level)
         {
             _currentLevel = new Level()
             {
                 LevelBlocksSequence = level.LevelBlocksSequence.Clone(),
+                LevelId = level.LevelId,
             };
         }
 
@@ -91,6 +86,12 @@ namespace Assets.Scripts.Managers
         public bool IsEmptyCell(Vector2Int cellIndex)
         {
             return CurrentLevelSequence[cellIndex] == EmptyCellId;
+        }
+
+        public void Dispose()
+        {
+            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
         }
     }
 }

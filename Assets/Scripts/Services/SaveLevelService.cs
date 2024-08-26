@@ -5,10 +5,12 @@ using System.IO;
 using System.Threading;
 using UnityEngine;
 using Assets.Scripts.Configs;
+using System;
+using System.Threading.Tasks;
 
 namespace Assets.Scripts.Services
 {
-    public class SaveLevelService : ISaveLevelService
+    public class SaveLevelService : ISaveLevelService, IDisposable
     {
         private readonly string _savingPath = Path.Combine(Application.persistentDataPath, "gameInfo.dat");
 
@@ -19,6 +21,11 @@ namespace Assets.Scripts.Services
         {
             _levelManeger = levelManager;
             _converter = converter;
+        }
+
+        public async void Dispose()
+        {
+            await SaveLevelStateAsync();
         }
 
         public async UniTask<Level> GetSavedDataAsync(CancellationToken cancellationToken)
@@ -33,10 +40,10 @@ namespace Assets.Scripts.Services
             return data;
         }
 
-        public async UniTask SaveLevelStateAsync(CancellationToken cancellationToken)
+        public async UniTask SaveLevelStateAsync(CancellationToken cancellationToken = default)
         {
-            var json = _converter.SerializeLevel(new Level() { LevelBlocksSequence = _levelManeger.CurrentLevelSequence });
-            await File.WriteAllTextAsync(_savingPath, json);
+            var json = _converter.SerializeLevel(new Level() { LevelBlocksSequence = _levelManeger.CurrentLevelSequence, LevelId = _levelManeger.CurrentLevelId });
+            await File.WriteAllTextAsync(_savingPath, json, cancellationToken);
         }
     }
 }

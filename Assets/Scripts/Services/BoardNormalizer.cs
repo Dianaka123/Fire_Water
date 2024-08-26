@@ -1,6 +1,5 @@
 using Assets.Scripts.Services.Interfaces;
 using Assets.Scripts.Wrappers;
-using Codice.Client.BaseCommands.BranchExplorer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,132 +9,105 @@ namespace Assets.Scripts.Services
 {
     public class BoardNormalizer : IBoardNormalizer
     {
-        private const int MinMatchCount = 3;
+        private const int MIN_SEQUENCE_LENGTH = 3;
 
-        private struct Sequence
+        private static readonly Vector2Int[] HORIZONTAL_DIRECTIONS = new[]
         {
-            public HashSet<Vector2Int> VisitedIndexes;
-            public int HorizontalCounter;
-            public int VerticalCounter;
-        }
+            Vector2Int.left,
+            Vector2Int.right,
+        };
 
-        public Vector2Int[] GetBlockSequenceForDestroying(Array2D<int> levelSequence, int emptyCellId)
+        private static readonly Vector2Int[] VERTICAL_DIRECTIONS = new[]
+        {
+            Vector2Int.up,
+            Vector2Int.down,
+        };
+
+        private static readonly Vector2Int[] DIRECTIONS = HORIZONTAL_DIRECTIONS
+            .Concat(VERTICAL_DIRECTIONS)
+            .ToArray();
+
+        public Vector2Int[] GetBlockSequenceForDestroying(Array2D<int> level, int emptyCellId)
         {
             var result = new HashSet<Vector2Int>();
             var visitedIndexes = new HashSet<Vector2Int>();
-            levelSequence.ForEach(index =>
+            level.ForEach(index =>
             {
-                var currentIndex = index;
-                if (levelSequence[index] == emptyCellId || visitedIndexes.Contains(currentIndex))
+                if (level[index] == emptyCellId || visitedIndexes.Contains(index))
                 {
                     return;
                 }
 
-                var startSequence = new Sequence() { HorizontalCounter = 1, VerticalCounter = 1, VisitedIndexes = new() };
+                visitedIndexes.Add(index);
 
-                var resultSequence = FindSequence(levelSequence, index, levelSequence[index], startSequence, 0, 0);
+                var maxSequenceLength = MaxSequenceLength(level, index);
 
-                foreach (var cell in resultSequence.VisitedIndexes)
+                if (maxSequenceLength < MIN_SEQUENCE_LENGTH)
                 {
-                    visitedIndexes.Add(cell);
+                    return;
                 }
 
-                if (resultSequence.HorizontalCounter >= MinMatchCount || resultSequence.VerticalCounter >= MinMatchCount)
+                HashSet<Vector2Int> sequence = new HashSet<Vector2Int>();
+                GetSequence(level, index, level[index], sequence);
+
+                foreach (var it in sequence)
                 {
-                    foreach (var cell in resultSequence.VisitedIndexes)
-                    {
-                        result.Add(cell);
-                    }
+                    visitedIndexes.Add(it);
+                    result.Add(it);
                 }
             });
 
             return result.ToArray();
         }
 
-        private Sequence FindSequence(Array2D<int> levelSequence, Vector2Int index, int value, Sequence sequence, int h, int v)
+        private static int MaxSequenceLength(Array2D<int> level, Vector2Int index)
         {
-            if(index.y < 0 
-                || index.x < 0 
-                || index.y >= levelSequence.RowCount 
-                || index.x >= levelSequence.ColumnCount
-                || levelSequence[index] != value
-                || sequence.VisitedIndexes.Contains(index))
+            var value = level[index];
+
+            int CheckSide(IEnumerable<Vector2Int> steps)
             {
-                return sequence;
+                int result = 0;
+                foreach (Vector2Int step in steps)
+                {
+                    int counter = 0;
+                    Vector2Int current = index + step;
+                    while (IsCellValid(level, current, value))
+                    {
+                        current += step;
+                        counter++;
+                    }
+                    result += counter;
+                }
+                return result;
             }
 
-            sequence = new Sequence()
-            {
-                VisitedIndexes = sequence.VisitedIndexes,
-                HorizontalCounter = sequence.HorizontalCounter + h,
-                VerticalCounter = sequence.VerticalCounter + v
-            };
-
-            sequence.VisitedIndexes.Add(index);
-
-            var left = index + Vector2Int.left;
-            var leftSeq = FindSequence(levelSequence, left, value, new Sequence()
-            {
-                VisitedIndexes = sequence.VisitedIndexes,
-                HorizontalCounter = sequence.HorizontalCounter,
-                VerticalCounter = 1,
-            }, 1, 0);
-            
-            var right = index + Vector2Int.right;
-            var rightSeq = FindSequence(levelSequence, right, value, new Sequence()
-            {
-                VisitedIndexes = sequence.VisitedIndexes,
-                HorizontalCounter = sequence.HorizontalCounter,
-                VerticalCounter = 1,
-            }, 1, 0);
-
-            var top = index + Vector2Int.up;
-            var topSeq = FindSequence(levelSequence, top, value, new Sequence()
-            {
-                VisitedIndexes = sequence.VisitedIndexes,
-                HorizontalCounter = 1,
-                VerticalCounter = sequence.VerticalCounter,
-            }, 0, 1);
-
-            var bottom = index + Vector2Int.down;
-            var bottomSeq = FindSequence(levelSequence, bottom, value, new Sequence()
-            {
-                VisitedIndexes = sequence.VisitedIndexes,
-                HorizontalCounter = 1,
-                VerticalCounter = sequence.VerticalCounter,
-            }, 0, 1);
-
-            var horizontalCounter = Math.Max(leftSeq.HorizontalCounter, rightSeq.HorizontalCounter);
-            horizontalCounter = Math.Max(horizontalCounter, topSeq.HorizontalCounter);
-            horizontalCounter = Math.Max(horizontalCounter, bottomSeq.HorizontalCounter);
-            horizontalCounter = Math.Max(horizontalCounter, sequence.HorizontalCounter);
-
-            var verticalCounter = Math.Max(leftSeq.VerticalCounter, rightSeq.VerticalCounter);
-            verticalCounter = Math.Max(verticalCounter, topSeq.VerticalCounter);
-            verticalCounter = Math.Max(verticalCounter, bottomSeq.VerticalCounter);
-            verticalCounter = Math.Max(verticalCounter, sequence.VerticalCounter);
-
-            return new Sequence() {
-                VisitedIndexes = sequence.VisitedIndexes,
-                HorizontalCounter = horizontalCounter,
-                VerticalCounter = verticalCounter 
-            };
+            int horizontal = CheckSide(HORIZONTAL_DIRECTIONS);
+            int vertical = CheckSide(VERTICAL_DIRECTIONS);
+            return Math.Max(horizontal, vertical) + 1;
         }
 
-        private int GoHorizontal(int[,] levelSequence, int x, int y, int count)
+        private static bool IsCellValid(Array2D<int> level, Vector2Int index, int value)
         {
-            var newY = y + 1;
+            return index.y >= 0
+                && index.x >= 0
+                && index.y < level.RowCount
+                && index.x < level.ColumnCount
+                && level[index] == value;
+        }
 
-            if (newY > 0 && newY < levelSequence.GetLength(1))
+        private static void GetSequence(Array2D<int> level, Vector2Int index, int value, HashSet<Vector2Int> sequence)
+        {
+            if (!IsCellValid(level, index, value) || sequence.Contains(index))
             {
-                if (levelSequence[x, y] == levelSequence[x, newY])
-                {
-                    Debug.Log($"{x} {y}");
-                    return GoHorizontal(levelSequence, x, newY, count + 1);
-                }
+                return;
             }
 
-            return count;
+            sequence.Add(index);
+
+            foreach (var direction in DIRECTIONS)
+            {
+                GetSequence(level, index + direction, value, sequence);
+            }
         }
     }
 }
