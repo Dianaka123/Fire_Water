@@ -5,11 +5,11 @@ using UnityEngine;
 
 namespace Assets.Scripts.Managers.Interfaces
 {
-    public interface IBlockManager
+    public interface IBlocksManager
     {
         void CreateBlocks(Array2D<int> level, GridData grid, Transform parent);
         void RestartLevel(Array2D<int> level, GridData grid, Transform parent);
         UniTask SwitchBlocksAsync(Vector2Int cellFrom, Vector2Int cellTo, Vector3 startPosition, Vector3 endPosition);
-        UniTask DestroyAsync(Vector2Int[] indexes);
+        UniTask DestroyBlocksAsync(Vector2Int[] indexes);
     }
 }

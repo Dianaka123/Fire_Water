@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.Managers
 {
-    public class BlocksManger : IBlockManager
+    public class BlocksManager : IBlocksManager
     {
         private const float MoveDuration = 0.2f;
 
@@ -17,7 +17,7 @@ namespace Assets.Scripts.Managers
 
         private Array2D<Block> _blocks;
 
-        public BlocksManger(BlocksPool pool)
+        public BlocksManager(BlocksPool pool)
         {
             _pool = pool;
         }
@@ -36,20 +36,21 @@ namespace Assets.Scripts.Managers
             level.ForEach(index =>
             {
                 var blockId = level[index];
-                if (blockId >= 0)
+                if (blockId < 0)
                 {
-                    var position = grid.Indexes[index.x, index.y];
-                    var block = _pool.GetBlockByID(blockId);
-                    ConfigureBlock(block, position, blockSize, parent);
-                    _blocks[index] = block;
+                    return;
                 }
+
+                var position = grid.Indexes[index.x, index.y];
+                var block = _pool.GetBlockByID(blockId);
+                ConfigureBlock(block, position, blockSize, parent);
+                _blocks[index] = block;
             });
         }
 
         public void RestartLevel(Array2D<int> level, GridData grid, Transform parent)
         {
             ClearBlocks();
-
             CreateBlocks(level, grid, parent);
         }
 
@@ -66,7 +67,7 @@ namespace Assets.Scripts.Managers
             await SwitchBlocksAnimationAsync(block1, block2, startPosition, endPosition);
         }
 
-        public async UniTask DestroyAsync(Vector2Int[] indexes)
+        public async UniTask DestroyBlocksAsync(Vector2Int[] indexes)
         {
             var animations = new List<UniTask>(indexes.Length);
 
@@ -122,10 +123,11 @@ namespace Assets.Scripts.Managers
 
         private async UniTask MoveBlockAnimationAsync(Block block, Vector3 to)
         {
-            if (block != null)
+            if (block == null)
             {
-                await block.AnimateMovingAsync(to, MoveDuration);
+                return;
             }
+            await block.AnimateMovingAsync(to, MoveDuration);
         }
 
         private void UpdateSiblingIndices()
@@ -134,11 +136,13 @@ namespace Assets.Scripts.Managers
             _blocks.ForEach(index =>
             {
                 var block = _blocks[index];
-                if (block != null)
+                if (block == null)
                 {
-                    block.SiblingIndex = counter;
-                    counter++;
+                    return;
                 }
+
+                block.SiblingIndex = counter;
+                counter++;
             });
 
         }

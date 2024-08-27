@@ -40,8 +40,7 @@ namespace Assets.Scripts.Services
 
                 visitedIndexes.Add(index);
 
-                var maxSequenceLength = MaxSequenceLength(level, index);
-
+                int maxSequenceLength = MaxSequenceLength(level, index);
                 if (maxSequenceLength < MIN_SEQUENCE_LENGTH)
                 {
                     return;
@@ -49,7 +48,6 @@ namespace Assets.Scripts.Services
 
                 HashSet<Vector2Int> sequence = new HashSet<Vector2Int>();
                 GetSequence(level, index, level[index], sequence);
-
                 foreach (var it in sequence)
                 {
                     visitedIndexes.Add(it);
@@ -62,7 +60,7 @@ namespace Assets.Scripts.Services
 
         private static int MaxSequenceLength(Array2D<int> level, Vector2Int index)
         {
-            var value = level[index];
+            int value = level[index];
 
             int CheckSide(IEnumerable<Vector2Int> steps)
             {

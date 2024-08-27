@@ -33,17 +33,16 @@ namespace Assets.Scripts.Managers
 
         public void SpawnBallons()
         {
-            var bottomOffset = _uiManager.Size.y * _balloonConfig.RelativeBottomOffset;
-            var stepY = (_uiManager.Size.y - bottomOffset)  / (_balloonConfig.TotalCount + 1);
+            float bottomOffset = _uiManager.Size.y * _balloonConfig.RelativeBottomOffset;
+            float stepY = (_uiManager.Size.y - bottomOffset) / (_balloonConfig.TotalCount + 1);
 
             for (int i = 0; i < _balloonConfig.TotalCount; i++)
             {
                 var ballonView = GameObject.Instantiate(_balloonConfig.Prefab, _uiManager.BallonRoot);
                 SetSprite(ballonView, i);
-                
-                var speed = Random.Range(_balloonConfig.MinSpeed, _balloonConfig.MaxSpeed);
 
-                var currentOffsetY = bottomOffset + (i + 1) * stepY;
+                float speed = Random.Range(_balloonConfig.MinSpeed, _balloonConfig.MaxSpeed);
+                float currentOffsetY = bottomOffset + (i + 1) * stepY;
 
                 _balloonParams[i] = new BalloonParams
                 {
@@ -59,14 +58,14 @@ namespace Assets.Scripts.Managers
 
         public void MoveBalloonsBySin()
         {
-            var time = Time.time;
+            float time = Time.time;
 
-            foreach(var ballon in _balloonParams)
+            foreach (var ballon in _balloonParams)
             {
-                var phase = (time / ballon.Duration + ballon.StartPhase) * 2 * Mathf.PI;
-                var x = ballon.AmpX * Mathf.Sin(phase);
-                var y = ballon.StartY + ballon.AmpY * Mathf.Sin(phase * 4);
-                ballon.Balloon.SetPosition(new Vector2 (x, y));
+                float phase = (time / ballon.Duration + ballon.StartPhase) * 2 * Mathf.PI;
+                float x = ballon.AmpX * Mathf.Sin(phase);
+                float y = ballon.StartY + ballon.AmpY * Mathf.Sin(phase * 4);
+                ballon.Balloon.SetPosition(new Vector2(x, y));
             }
         }
 
@@ -80,7 +79,7 @@ namespace Assets.Scripts.Managers
 
         private float GetSize()
         {
-            var minSide = _uiManager.Size.x;
+            float minSide = _uiManager.Size.x;
             return minSide * _balloonConfig.RelativeSize;
         }
     }

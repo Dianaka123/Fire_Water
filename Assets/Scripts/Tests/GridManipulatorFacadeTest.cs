@@ -58,13 +58,14 @@ namespace Assets.Scripts.Tests
             levelManagerMock.Setup(m => m.SwitchBlocks(It.IsAny<Vector2Int>(), It.IsAny<Vector2Int>()))
                 .Callback(() => isLevelArraySwitchCalled = true);
 
-            var blockManagerMock = new Mock<IBlockManager>();
+            var blockManagerMock = new Mock<IBlocksManager>();
             blockManagerMock.Setup(b => b.SwitchBlocksAsync(It.IsAny<Vector2Int>(), It.IsAny<Vector2Int>(), It.IsAny<Vector3>(), It.IsAny<Vector3>()))
                 .Callback(() => isBlocksArraySwitchCalled = true);
 
             Container.Bind<ILevelManager>().FromInstance(levelManagerMock.Object);
-            Container.Bind<IBlockManager>().FromInstance(blockManagerMock.Object);
+            Container.Bind<IBlocksManager>().FromInstance(blockManagerMock.Object);
             Container.Bind<IBoardNormalizer>().FromInstance(new Mock<IBoardNormalizer>().Object);
+            Container.Bind<ISaveLevelService>().FromInstance(new Mock<ISaveLevelService>().Object);
             Container.Bind<GridManipulatorFacade>().AsSingle();
 
         }
@@ -73,7 +74,7 @@ namespace Assets.Scripts.Tests
         public void MoveBlockAsync_CorrectIndexes_SwitchCalled((Vector2Int from, Vector2Int direction) value)
         {
             MockGridManager(value.from);
-            facade.SwitchCellsThenNormilize(Vector3.zero, value.direction).Forget();
+            facade.SwitchCellsThenNormalize(Vector3.zero, value.direction).Forget();
             Assert.IsTrue(isLevelArraySwitchCalled && isBlocksArraySwitchCalled);
         }
 
@@ -81,7 +82,7 @@ namespace Assets.Scripts.Tests
         public void MoveBlockAsync_IncorrectIndexes_SwitchCalled((Vector2Int from, Vector2Int direction) value)
         {
             MockGridManager(value.from);
-            facade.SwitchCellsThenNormilize(Vector3.zero, value.direction).Forget();
+            facade.SwitchCellsThenNormalize(Vector3.zero, value.direction).Forget();
             Assert.IsFalse(isLevelArraySwitchCalled && isBlocksArraySwitchCalled);
         }
 
@@ -89,7 +90,7 @@ namespace Assets.Scripts.Tests
         public void MoveBlockAsync_CorrectIndex_SwitchUpWithEmpty()
         {
             MockGridManager(new Vector2Int(0, 2));
-            facade.SwitchCellsThenNormilize(Vector3.zero, Vector2Int.up).Forget();
+            facade.SwitchCellsThenNormalize(Vector3.zero, Vector2Int.up).Forget();
             Assert.IsFalse(isLevelArraySwitchCalled && isBlocksArraySwitchCalled);
         }
 

@@ -22,7 +22,7 @@ namespace Assets.Scripts.Services
 
         private readonly GameResources _gameResources;
 
-        private List<UniqBlockData> _blocks = new List<UniqBlockData>();
+        private readonly List<UniqBlockData> _blocks = new();
         private Transform _root;
 
         public BlocksPool(GameResources gameResources)
@@ -38,11 +38,11 @@ namespace Assets.Scripts.Services
 
         public Block GetBlockByID(int id)
         {
-            var blocksData = _blocks.FirstOrDefault(b => b.Id == id);
+            UniqBlockData blocksData = _blocks.FirstOrDefault(b => b.Id == id);
 
             if (blocksData.AvailableBlocks == null)
             {
-                blocksData = InitUniqBlockData(id, blocksData);
+                blocksData = InitUniqBlockData(id);
                 _blocks.Add(blocksData);
             }
 
@@ -54,36 +54,36 @@ namespace Assets.Scripts.Services
 
         public void DestroyBlock(Block block)
         {
-            var blockData = _blocks.FirstOrDefault(b => b.UsedBlocks.Contains(block));
+            UniqBlockData blockData = _blocks.FirstOrDefault(b => b.UsedBlocks.Contains(block));
             ReturnBlock(blockData, block);
         }
 
-        private UniqBlockData InitUniqBlockData(int id, UniqBlockData blocksData)
+        private UniqBlockData InitUniqBlockData(int id)
         {
-            blocksData = new UniqBlockData()
+            return new UniqBlockData()
             {
                 Id = id,
                 AvailableBlocks = new List<Block>(MinBlocksInstances),
                 UsedBlocks = new List<Block>(MinBlocksInstances),
             };
-
-            return blocksData;
         }
 
         private void CheckAvailableBlocks(int id, UniqBlockData blocksData)
         {
-            if (blocksData.AvailableBlocks.IsEmpty())
+            if (!blocksData.AvailableBlocks.IsEmpty())
             {
-                for (int i = 0; i < MinBlocksInstances; i++)
-                {
-                    blocksData.AvailableBlocks.Add(InstantiateBlock(id));
-                }
+                return;
+            }
+
+            for (int i = 0; i < MinBlocksInstances; i++)
+            {
+                blocksData.AvailableBlocks.Add(InstantiateBlock(id));
             }
         }
 
         private Block InstantiateBlock(int id)
         {
-            var block = GameObject.Instantiate(_gameResources.Bloks[id], _root);
+            Block block = GameObject.Instantiate(_gameResources.Bloks[id], _root);
             block.gameObject.SetActive(false);
 
             return block;
@@ -91,7 +91,7 @@ namespace Assets.Scripts.Services
 
         private Block UseBlock(UniqBlockData blocksData)
         {
-            var block = blocksData.AvailableBlocks[0];
+            Block block = blocksData.AvailableBlocks[0];
             blocksData.AvailableBlocks.Remove(block);
             blocksData.UsedBlocks.Add(block);
             block.gameObject.SetActive(true);

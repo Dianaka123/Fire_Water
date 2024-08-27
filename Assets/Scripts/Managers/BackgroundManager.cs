@@ -20,26 +20,20 @@ namespace Assets.Scripts.Managers
 
         public BackgroundData GetBackgroundByLevelIndex(int levelIndex)
         {
-            var levelId = levelIndex + 1;
-
+            int levelId = levelIndex + 1;
             if (IsLevelIndexInBoard(_currentBackgroundConfig, levelId))
             {
                 return _backgroundData;
             }
 
-            var config = _backgroundConfigs.Where(config => IsLevelIndexInBoard(config, levelId))
-                              .First();
-
-            if (config.Sprite != null)
-            {
-                _currentBackgroundConfig = config;
-            }
-            else
+            var config = _backgroundConfigs.Where(config => IsLevelIndexInBoard(config, levelId)).First();
+            if (config.Sprite == null)
             {
                 //Can be loaded default background
                 throw new ArgumentException($"No background for {levelId}");
             }
 
+            _currentBackgroundConfig = config;
             _backgroundData = new BackgroundData()
             {
                 Sprite = _currentBackgroundConfig.Sprite,
@@ -49,7 +43,7 @@ namespace Assets.Scripts.Managers
             return _backgroundData;
         }
 
-        private bool IsLevelIndexInBoard(BackgroundConfig config, int levelId) 
+        private bool IsLevelIndexInBoard(BackgroundConfig config, int levelId)
             => config.StartLevelId <= levelId && config.EndLevelId >= levelId;
     }
 }

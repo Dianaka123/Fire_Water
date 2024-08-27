@@ -39,7 +39,7 @@ namespace Assets.Scripts.Installers
         {
             Container.BindInterfacesAndSelfTo<LevelManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<GridManager>().AsSingle();
-            Container.BindInterfacesAndSelfTo<BlocksManger>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BlocksManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<GridManipulatorFacade>().AsSingle();
             Container.BindInterfacesAndSelfTo<BalloonManager>().AsSingle();
             Container.BindInterfacesAndSelfTo<BackgroundManager>().AsSingle();

@@ -1,5 +1,6 @@
-using Assets.Scripts.ScriptableObjects;
+using Assets.Scripts.Data;
 using Assets.Scripts.Managers.Interfaces;
+using Assets.Scripts.Services.Data;
 using Assets.Scripts.Wrappers;
 
 namespace Assets.Scripts.Services
@@ -8,10 +9,10 @@ namespace Assets.Scripts.Services
     {
         private readonly IUIManger _uiManager;
         private readonly IGridManager _gridManager;
-        private readonly IBlockManager _blocksManger;
+        private readonly IBlocksManager _blocksManger;
         private readonly IBackgroundManager _backgroundManager;
 
-        public LevelBuilder(IBlockManager blocksManger, IGridManager gridManager,
+        public LevelBuilder(IBlocksManager blocksManger, IGridManager gridManager,
             IUIManger canvasManager, IBackgroundManager backgroundManager)
         {
             _blocksManger = blocksManger;
@@ -22,11 +23,10 @@ namespace Assets.Scripts.Services
 
         public void BuildLevel(Array2D<int> level, int levelIndex)
         {
-            var background = _backgroundManager.GetBackgroundByLevelIndex(levelIndex);
+            BackgroundData background = _backgroundManager.GetBackgroundByLevelIndex(levelIndex);
             _uiManager.SetBackground(background.Sprite);
-            
-            var grid = _gridManager.CreateGrid(level.Size, background.BoardConfig);
 
+            GridData grid = _gridManager.CreateGrid(level.Size, background.BoardConfig);
             _blocksManger.CreateBlocks(level, grid, _uiManager.BlocksRoot);
         }
 

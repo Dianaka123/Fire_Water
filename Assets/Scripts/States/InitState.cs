@@ -1,3 +1,4 @@
+using Assets.Scripts.Data;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services;
 using Assets.Scripts.Services.Interfaces;
@@ -28,21 +29,23 @@ namespace Assets.Scripts.States
         public async override UniTask Run(CancellationToken token)
         {
             await UpdateLevelStateBySavedData(token);
-
             _levelBuilder.BuildLevel(_levelManager.CurrentLevelSequence, _levelManager.CurrentLevelIndex);
             await GoTo(_playState, token);
         }
 
         private async UniTask UpdateLevelStateBySavedData(CancellationToken token)
         {
-            var saving = await _saveLevelService.GetSavedDataAsync(token);
-
-            if(saving == null)
+            Level savedLevel = await _saveLevelService.GetSavedDataAsync(token);
+            if (savedLevel == null)
             {
                 return;
             }
 
-            _levelManager.UpdateLevel(saving);
+            _levelManager.UpdateLevel(savedLevel);
+            if (_levelManager.IsLevelCompleted())
+            {
+                _levelManager.NextLevel();
+            }
         }
     }
 }

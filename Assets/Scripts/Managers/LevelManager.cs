@@ -22,7 +22,7 @@ namespace Assets.Scripts.Managers
 
         private Level _currentLevel;
         private Level[] _levels;
-        
+
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
 
         public LevelManager(LevelsConfiguration levelsConfiguration, ILevelJsonConverter converter)
@@ -45,9 +45,9 @@ namespace Assets.Scripts.Managers
 
         public void NextLevel()
         {
-            var nextId = CurrentLevelIndex + 1;
+            int nextId = CurrentLevelIndex + 1;
 
-            if(nextId >= _levels.Length)
+            if (nextId >= _levels.Length)
             {
                 nextId = 0;
             }
@@ -63,7 +63,7 @@ namespace Assets.Scripts.Managers
         public bool IsLevelCompleted()
         {
             return CurrentLevelSequence.Array1D.All(x => x == EmptyCellId);
-        } 
+        }
 
         private void UpdateCurrentLevel(Level level)
         {
@@ -76,8 +76,8 @@ namespace Assets.Scripts.Managers
 
         public void SwitchBlocks(Vector2Int from, Vector2Int to)
         {
-            var block1 = CurrentLevelSequence[from];
-            var block2 = CurrentLevelSequence[to];
+            int block1 = CurrentLevelSequence[from];
+            int block2 = CurrentLevelSequence[to];
 
             CurrentLevelSequence[from] = block2;
             CurrentLevelSequence[to] = block1;

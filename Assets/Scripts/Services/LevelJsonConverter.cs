@@ -26,23 +26,23 @@ namespace Assets.Scripts.Services
             var deserializedData = JsonConvert.DeserializeObject<LevelSavingData>(txt);
             var level2d = new Array2D<int>(deserializedData.LevelDesc.LevelBlocksSequence, deserializedData.LevelDesc.RowCount, deserializedData.LevelDesc.ColumnCount);
 
-            return new Level() { LevelBlocksSequence = level2d, LevelIndex = deserializedData.LevelId};
+            return new Level() { LevelBlocksSequence = level2d, LevelIndex = deserializedData.LevelId };
         }
 
         public Level[] DeserializeAllLevels(string txt)
-        { 
+        {
             var deserializedData = JsonConvert.DeserializeObject<Levels>(txt);
-            var levelDescs = deserializedData.LevelsDesc;
-            var levelCount = levelDescs.Length;
+            LevelDesc[] levelDescs = deserializedData.LevelsDesc;
+            int levelCount = levelDescs.Length;
 
             Level[] levels = new Level[levelCount];
             for (int i = 0; i < levelCount; i++)
             {
-                var levelDesc = levelDescs[i];
-                var rowCount = levelDesc.RowCount;
-                var columnCount = levelDesc.ColumnCount;
+                LevelDesc levelDesc = levelDescs[i];
+                int rowCount = levelDesc.RowCount;
+                int columnCount = levelDesc.ColumnCount;
 
-                var levelSequence = ConvertArray(levelDesc.LevelBlocksSequence, rowCount, columnCount);
+                var levelSequence = ReadConfigLevelSequence(levelDesc.LevelBlocksSequence, rowCount, columnCount);
                 levels[i] = new Level()
                 {
                     LevelBlocksSequence = new Array2D<int>(levelSequence, rowCount, columnCount),
@@ -53,10 +53,10 @@ namespace Assets.Scripts.Services
             return levels;
         }
 
-        private int[] ConvertArray(int[] configLevelSequence, int rows, int columns)
+        private int[] ReadConfigLevelSequence(int[] configLevelSequence, int rows, int columns)
         {
             var arr = new int[configLevelSequence.Length];
-            var index = 0;
+            int index = 0;
 
             for (var i = rows - 1; i >= 0; i--)
             {

@@ -10,7 +10,7 @@ namespace Assets.Scripts.Services
 {
     public class SaveLevelService : ISaveLevelService
     {
-        private readonly string _savingPath = Path.Combine(Application.persistentDataPath, "gameInfo.dat");
+        private static readonly string _savingPath = Path.Combine(Application.persistentDataPath, "gameInfo.dat");
 
         private readonly ILevelManager _levelManeger;
         private readonly LevelJsonConverter _converter;
@@ -23,14 +23,13 @@ namespace Assets.Scripts.Services
 
         public async UniTask<Level> GetSavedDataAsync(CancellationToken cancellationToken)
         {
-            Level data = null;
-            if(File.Exists(_savingPath))
+            if (!File.Exists(_savingPath))
             {
-                var savedData = await File.ReadAllTextAsync(_savingPath);
-                data = _converter.DeserializeLevel(savedData);
+                return null;
             }
 
-            return data;
+            var savedData = await File.ReadAllTextAsync(_savingPath, cancellationToken);
+            return _converter.DeserializeLevel(savedData);
         }
 
         public async UniTask SaveLevelStateAsync(CancellationToken cancellationToken = default)

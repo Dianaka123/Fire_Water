@@ -1,5 +1,6 @@
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Interfaces;
+using Assets.Scripts.Wrappers;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,57 +13,52 @@ namespace Assets.Scripts.Managers
 
         private readonly ILevelManager _levelManager;
         private readonly IGridManager _gridManager;
-        private readonly IBlockManager _blocksManger;
+        private readonly IBlocksManager _blocksManger;
         private readonly IBoardNormalizer _boardNormalizer;
+        private readonly ISaveLevelService _saveLevelService;
 
         private int _row => _levelManager.CurrentLevelSequence.RowCount;
         private int _column => _levelManager.CurrentLevelSequence.ColumnCount;
 
-        public GridManipulatorFacade(ILevelManager levelManager, IBlockManager blocksManger, IGridManager gridManager, IBoardNormalizer boardNormalizer)
+        public GridManipulatorFacade(ILevelManager levelManager, IBlocksManager blocksManger, IGridManager gridManager, IBoardNormalizer boardNormalizer, ISaveLevelService saveLevelService)
         {
             _levelManager = levelManager;
             _blocksManger = blocksManger;
             _gridManager = gridManager;
             _boardNormalizer = boardNormalizer;
+            _saveLevelService = saveLevelService;
         }
 
-        public async UniTask SwitchCellsThenNormilize(Vector3 startPosition, Vector2Int directon)
+        public async UniTask SwitchCellsThenNormalize(Vector3 startPosition, Vector2Int directon)
         {
-            var startCell = GetStartCell(startPosition);
-            var nextCell = startCell + directon;
-            var isSwitched = IsSwitchAvailable(startCell, nextCell);
+            Vector2Int startCell = GetStartCell(startPosition);
+            Vector2Int nextCell = startCell + directon;
 
-            if (isSwitched)
+            if (!IsSwitchAvailable(startCell, nextCell))
             {
-                await SwitchAsync(startCell, nextCell);
-                await CheckFallBlocksAsync();
-                await ReshuffleAsync();
+                return;
             }
+
+            await SwitchAsync(startCell, nextCell);
+            await CheckFallBlocksAsync();
+            await ReshuffleAsync();
+            _saveLevelService.SaveLevelStateAsync().Forget();
         }
 
         private Vector2Int GetStartCell(Vector3 position)
-        {
-            var startCellNullable = _gridManager.GetCellIndexByScreenPosition(position);
-
-            return startCellNullable == null
-                ? InvalidCell
-                : startCellNullable.Value;
-        }
+            => _gridManager.GetCellIndexByScreenPosition(position) ?? InvalidCell;
 
         private bool IsSwitchAvailable(Vector2Int startCell, Vector2Int nextCell)
         {
-            if( IsCellsInvalid(startCell, nextCell))
-                return false;
-
-            if(_levelManager.IsEmptyCell(startCell) || IsMoveUpByEmptyCell(startCell, nextCell))
+            if (AreCellsInvalid(startCell, nextCell))
             {
                 return false;
             }
 
-             return true;
+            return !_levelManager.IsEmptyCell(startCell) && !IsMoveUpByEmptyCell(startCell, nextCell);
         }
 
-        private bool IsCellsInvalid(Vector2Int from, Vector2Int to)
+        private bool AreCellsInvalid(Vector2Int from, Vector2Int to)
             => from == to
             || from == InvalidCell
             || to.x >= _column
@@ -72,8 +68,7 @@ namespace Assets.Scripts.Managers
 
         private bool IsMoveUpByEmptyCell(Vector2Int from, Vector2Int to)
         {
-            var isUp = (to - from).y > 0;
-
+            bool isUp = (to - from).y > 0;
             return isUp && _levelManager.IsEmptyCell(to);
         }
 
@@ -81,47 +76,44 @@ namespace Assets.Scripts.Managers
         {
             _levelManager.SwitchBlocks(from, to);
 
-            var startPosition = _gridManager.GetScreenPositionByCellIndex(from);
-            var endPosition = _gridManager.GetScreenPositionByCellIndex(to);
+            Vector2 startPosition = _gridManager.GetScreenPositionByCellIndex(from);
+            Vector2 endPosition = _gridManager.GetScreenPositionByCellIndex(to);
 
             await _blocksManger.SwitchBlocksAsync(from, to, startPosition, endPosition);
         }
 
         private async UniTask ReshuffleAsync()
         {
-            var indexesToDestroy = _boardNormalizer.GetBlockSequenceForDestroying(_levelManager.CurrentLevelSequence, _levelManager.EmptyCellId);
-            
-            if(indexesToDestroy.Length == 0)
+            Vector2Int[] indexesToDestroy = _boardNormalizer.GetBlockSequenceForDestroying(_levelManager.CurrentLevelSequence, _levelManager.EmptyCellId);
+            if (indexesToDestroy.Length == 0)
             {
                 return;
             }
 
-            await _blocksManger.DestroyAsync(indexesToDestroy);
-
-            foreach( var index in indexesToDestroy)
+            await _blocksManger.DestroyBlocksAsync(indexesToDestroy);
+            foreach (var index in indexesToDestroy)
             {
                 _levelManager.SetEmptyCell(index);
             }
 
             await CheckFallBlocksAsync();
-
             await ReshuffleAsync();
         }
 
         private async UniTask CheckFallBlocksAsync()
         {
-            var levelSequence = _levelManager.CurrentLevelSequence;
+            Array2D<int> levelSequence = _levelManager.CurrentLevelSequence;
             var animations = new List<UniTask>();
             for (var x = 0; x < levelSequence.ColumnCount; x++)
             {
-                var currentBottom = 0;
+                int currentBottom = 0;
                 for (var y = 0; y < levelSequence.RowCount; y++)
                 {
-                    var value = levelSequence[x, y];
-                    if (value != _levelManager.EmptyCellId )
+                    int value = levelSequence[x, y];
+                    if (value != _levelManager.EmptyCellId)
                     {
-                        var isFall = currentBottom != y;
-                        if (isFall)
+                        var shouldFall = currentBottom != y;
+                        if (shouldFall)
                         {
                             animations.Add(SwitchAsync(new Vector2Int(x, y), new Vector2Int(x, currentBottom)));
                         }

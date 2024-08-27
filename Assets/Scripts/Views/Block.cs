@@ -39,7 +39,7 @@ namespace Assets.Scripts.Views
             }
         }
 
-        private void Start()
+        private void OnEnable()
         {
             _animator.SetFloat(StartDelayHash, Random.Range(0.0f, 1.0f));
         }
