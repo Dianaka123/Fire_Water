@@ -56,8 +56,6 @@ namespace Assets.Scripts.Managers
 
         public async UniTask SwitchBlocksAsync(Vector2Int cellFrom, Vector2Int cellTo, Vector3 startPosition, Vector3 endPosition)
         {
-            await SwitchBlocksAnimationAsync(cellFrom, cellTo, startPosition, endPosition);
-
             var block1 = _blocks[cellFrom];
             var block2 = _blocks[cellTo];
 
@@ -65,6 +63,7 @@ namespace Assets.Scripts.Managers
             _blocks[cellFrom] = block2;
 
             UpdateSiblingIndices();
+            await SwitchBlocksAnimationAsync(block1, block2, startPosition, endPosition);
         }
 
         public async UniTask DestroyAsync(Vector2Int[] indexes)
@@ -113,17 +112,16 @@ namespace Assets.Scripts.Managers
             block.SetSize(size);
         }
 
-        private UniTask SwitchBlocksAnimationAsync(Vector2Int cellFrom, Vector2Int cellTo, Vector3 startPosition, Vector3 endPosition)
+        private UniTask SwitchBlocksAnimationAsync(Block from, Block to, Vector3 startPosition, Vector3 endPosition)
         {
             return UniTask.WhenAll(
-                MoveBlockAnimationAsync(cellFrom, endPosition),
-                MoveBlockAnimationAsync(cellTo, startPosition)
+                MoveBlockAnimationAsync(from, endPosition),
+                MoveBlockAnimationAsync(to, startPosition)
             );
         }
 
-        private async UniTask MoveBlockAnimationAsync(Vector2Int blockIndex, Vector3 to)
+        private async UniTask MoveBlockAnimationAsync(Block block, Vector3 to)
         {
-            var block = _blocks[blockIndex];
             if (block != null)
             {
                 await block.AnimateMovingAsync(to, MoveDuration);
