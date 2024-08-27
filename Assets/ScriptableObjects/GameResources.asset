@@ -30,4 +30,4 @@ MonoBehaviour:
     Prefab: {fileID: 4505333282574644595, guid: 62f63ca0b8e02d74d8979573eab0d710, type: 3}
     RelativeSize: 0.242
     MinSpeed: 0.1
-    MaxSpeed: 1
+    MaxSpeed: 0.6

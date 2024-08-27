@@ -45,6 +45,8 @@ namespace Assets.Scripts.Configs
         [Range(0, 1)]
         public float RelativeSize;
 
+        public float Duration;
+
         //TODO: Constrain for min max
         public float MinSpeed;
         public float MaxSpeed;
