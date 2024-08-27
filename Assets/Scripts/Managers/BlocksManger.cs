@@ -1,11 +1,11 @@
 using Assets.Scripts.Configs;
 using Assets.Scripts.Managers.Interfaces;
+using Assets.Scripts.Services;
 using Assets.Scripts.Services.Data;
 using Assets.Scripts.Views;
 using Assets.Scripts.Wrappers;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 namespace Assets.Scripts.Managers
@@ -14,13 +14,13 @@ namespace Assets.Scripts.Managers
     {
         private const float MoveDuration = 0.5f;
 
-        private readonly GameResources _gameResources;
+        private readonly BlocksPool _pool;
 
         private Array2D<Block> _blocks;
 
-        public BlocksManger(GameResources gameResources)
+        public BlocksManger(BlocksPool pool)
         {
-            _gameResources = gameResources;
+            _pool = pool;
         }
 
         public void CreateBlocks(Array2D<int> level, GridData grid, Transform parent)
@@ -36,12 +36,13 @@ namespace Assets.Scripts.Managers
 
             level.ForEach(index =>
             {
-                var blockValue = level[index];
-                if (blockValue >= 0)
+                var blockId = level[index];
+                if (blockId >= 0)
                 {
                     var position = grid.Indexes[index.x, index.y];
-                    var blockPrefab = _gameResources.Bloks[blockValue];
-                    _blocks[index] = CreateBlock(index, blockPrefab, position, blockSize, parent);
+                    var block = _pool.GetBlockByID(blockId);
+                    ConfigureBlock(block, position, blockSize, parent);
+                    _blocks[index] = block;
                 }
             });
         }
@@ -79,8 +80,7 @@ namespace Assets.Scripts.Managers
 
             foreach (var index in indexes)
             {
-                _blocks[index].DestroyBlock();
-                _blocks[index] = null;
+                DestroyBlock(index);
             }
         }
 
@@ -95,19 +95,22 @@ namespace Assets.Scripts.Managers
             {
                 if (_blocks[index] != null)
                 {
-                    _blocks[index].DestroyBlock();
-                    _blocks[index] = null;
+                    DestroyBlock(index);
                 }
             });
         }
 
-        private Block CreateBlock(Vector2Int index, Block blockPrefab, Vector2 position, float size, Transform parent)
+        private void DestroyBlock(Vector2Int index)
         {
-            var block = GameObject.Instantiate(blockPrefab, parent);
+            _pool.DestroyBlock(_blocks[index]);
+            _blocks[index] = null;
+        }
+
+        private void ConfigureBlock(Block block, Vector2 position, float size, Transform parent)
+        {
+            block.transform.SetParent(parent);
             block.transform.localPosition = position;
             block.SetSize(size);
-
-            return block;
         }
 
         private UniTask SwitchBlocksAnimationAsync(Vector2Int cellFrom, Vector2Int cellTo, Vector3 startPosition, Vector3 endPosition)

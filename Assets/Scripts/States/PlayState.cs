@@ -91,7 +91,7 @@ namespace Assets.Scripts.States
             GoTo(_restartLevelState.Value).Forget();
         }
 
-        private async void Next()
+        private void Next()
         {
             GoTo(_nextLevelState.Value).Forget();
         }

@@ -48,6 +48,7 @@ namespace Assets.Scripts.Views
         {
             var scaledSize = cellSize * _scaleRatio;
             _image.rectTransform.sizeDelta = new Vector2 (scaledSize, scaledSize);
+            _rectTransform.localScale = Vector3.one;
         }
 
         public UniTask AnimateMovingAsync(Vector3 to, float duration)
@@ -66,11 +67,6 @@ namespace Assets.Scripts.Views
         public async UniTask DestroyAnimation()
         {
             await _animator.SetTriggerAsync(DestroyHash, this);
-        }
-
-        public void DestroyBlock()
-        {
-            Destroy(gameObject);
         }
     }
 }

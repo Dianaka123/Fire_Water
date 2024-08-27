@@ -21,6 +21,7 @@ namespace Assets.Scripts.Installers
             Container.BindInterfacesAndSelfTo<InputSystem>().AsSingle();
             Container.BindInterfacesAndSelfTo<LevelJsonConverter>().AsSingle();
             Container.BindInterfacesAndSelfTo<BoardNormalizer>().AsSingle();
+            Container.BindInterfacesAndSelfTo<BlocksPool>().AsSingle();
             
             Container.BindInterfacesAndSelfTo<SaveLevelService>().AsSingle();
             
