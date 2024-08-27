@@ -1,4 +1,4 @@
-using Assets.Scripts.Configs;
+using Assets.Scripts.Data;
 using Assets.Scripts.Services;
 using NUnit.Framework;
 using System;

@@ -24,7 +24,8 @@ namespace Assets.Scripts.States
         {
             _levelManager.NextLevel();
 
-            _levelBuilder.BuildLevel(_levelManager.CurrentLevelSequence);
+            _levelBuilder.BuildLevel(_levelManager.CurrentLevelSequence, _levelManager.CurrentLevelIndex);
+            
             await GoTo(_playState, token);
         }
     }

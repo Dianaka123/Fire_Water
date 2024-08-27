@@ -1,5 +1,4 @@
 using Cysharp.Threading.Tasks;
-using System.Threading;
 using UnityEngine;
 
 namespace Assets.Scripts.Extensions
@@ -9,7 +8,7 @@ namespace Assets.Scripts.Extensions
         public static async UniTask SetTriggerAsync(this Animator animator, int id, MonoBehaviour monoBehaviour)
         {
             animator.SetTrigger(id);
-            
+
             await UniTask.WaitForEndOfFrame(monoBehaviour);
 
             await UniTask.WaitUntil(() =>

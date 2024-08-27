@@ -1,4 +1,4 @@
-﻿using Assets.Scripts.Configs;
+﻿using Assets.Scripts.Data;
 
 namespace Assets.Scripts.Services.Interfaces
 {

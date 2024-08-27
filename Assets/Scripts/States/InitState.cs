@@ -29,7 +29,7 @@ namespace Assets.Scripts.States
         {
             await UpdateLevelStateBySavedData(token);
 
-            _levelBuilder.BuildLevel(_levelManager.CurrentLevelSequence);
+            _levelBuilder.BuildLevel(_levelManager.CurrentLevelSequence, _levelManager.CurrentLevelIndex);
             await GoTo(_playState, token);
         }
 
@@ -42,7 +42,7 @@ namespace Assets.Scripts.States
                 return;
             }
 
-            _levelManager.UpdateLevelBySavingData(saving);
+            _levelManager.UpdateLevel(saving);
         }
     }
 }

@@ -1,4 +1,4 @@
-using Assets.Scripts.Configs;
+using Assets.Scripts.Data;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Data;
 using Assets.Scripts.Services.Interfaces;

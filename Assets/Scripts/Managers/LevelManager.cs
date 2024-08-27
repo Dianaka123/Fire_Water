@@ -1,4 +1,5 @@
-using Assets.Scripts.Configs;
+using Assets.Scripts.ScriptableObjects;
+using Assets.Scripts.Data;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Interfaces;
 using Assets.Scripts.Wrappers;
@@ -16,7 +17,7 @@ namespace Assets.Scripts.Managers
         private readonly ILevelJsonConverter _converter;
 
         public Array2D<int> CurrentLevelSequence => _currentLevel.LevelBlocksSequence;
-        public int CurrentLevelId => _currentLevel.LevelId;
+        public int CurrentLevelIndex => _currentLevel.LevelIndex;
         public int EmptyCellId => -1;
 
         private Level _currentLevel;
@@ -37,14 +38,14 @@ namespace Assets.Scripts.Managers
             UpdateCurrentLevel(_levels[0]);
         }
 
-        public void UpdateLevelBySavingData(Level level)
+        public void UpdateLevel(Level level)
         {
             UpdateCurrentLevel(level);
         }
 
         public void NextLevel()
         {
-            var nextId = CurrentLevelId + 1;
+            var nextId = CurrentLevelIndex + 1;
 
             if(nextId >= _levels.Length)
             {
@@ -56,7 +57,7 @@ namespace Assets.Scripts.Managers
 
         public void RestartLevel()
         {
-            UpdateCurrentLevel(_levels[CurrentLevelId]);
+            UpdateCurrentLevel(_levels[CurrentLevelIndex]);
         }
 
         public bool IsLevelCompleted()
@@ -69,7 +70,7 @@ namespace Assets.Scripts.Managers
             _currentLevel = new Level()
             {
                 LevelBlocksSequence = level.LevelBlocksSequence.Clone(),
-                LevelId = level.LevelId,
+                LevelIndex = level.LevelIndex,
             };
         }
 

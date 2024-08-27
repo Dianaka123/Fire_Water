@@ -27,18 +27,18 @@ namespace Assets.Scripts.Tests
 
         private static (Vector2Int, Vector2Int)[] correctIndexes = new[]
         {
-            (new Vector2Int(0, 1),new Vector2Int(1, 1)),
-            (new Vector2Int(0, 1), new Vector2Int(0, 0)),
-            (new Vector2Int(0, 1), new Vector2Int(0, 2)),
-            (new Vector2Int(1, 1), new Vector2Int(0, 0)),
+            (new Vector2Int(0, 1),new Vector2Int(1, 0)),
+            (new Vector2Int(0, 1), new Vector2Int(0, -1)),
+            (new Vector2Int(0, 1), new Vector2Int(0, 1)),
+            (new Vector2Int(1, 1), new Vector2Int(-1, -1)),
         };
 
         private static (Vector2Int, Vector2Int)[] incorrectIndexes = new[]
         {
             (new Vector2Int(0, 0),new Vector2Int(0, -1)),
             (new Vector2Int(0, 0), new Vector2Int(-1, 0)),
-            (new Vector2Int(0, 3), new Vector2Int(0, 4)),
-            (new Vector2Int(1, 0), new Vector2Int(2, 0)),
+            (new Vector2Int(0, 3), new Vector2Int(0, 1)),
+            (new Vector2Int(1, 0), new Vector2Int(1, 0)),
         };
 
         [Inject]
@@ -66,7 +66,6 @@ namespace Assets.Scripts.Tests
 
             Container.Bind<ILevelManager>().FromInstance(levelManagerMock.Object);
             Container.Bind<IBlockManager>().FromInstance(blockManagerMock.Object);
-            Container.Bind<IGridManager>().FromInstance(new Mock<IGridManager>().Object);
             Container.Bind<IBoardNormalizer>().FromInstance(new Mock<IBoardNormalizer>().Object);
             Container.Bind<MoveBlocksManager>().AsSingle();
 
@@ -76,22 +75,33 @@ namespace Assets.Scripts.Tests
         [TestCaseSource("correctIndexes")]
         public async void MoveBlockAsync_CorrectIndexes_SwitchCalled((Vector2Int, Vector2Int) value)
         {
-            await manager.MoveBlockAsync(value.Item1, value.Item2);
+            MockGridManager(value.Item1);
+            await manager.MoveBlockAsync(Vector3.zero, value.Item2);
             Assert.IsTrue(isLevelArraySwitchCalled && isBlocksArraySwitchCalled);
         }
 
         [TestCaseSource("incorrectIndexes")]
         public async void MoveBlockAsync_IncorrectIndexes_SwitchCalled((Vector2Int, Vector2Int) value)
         {
-            await manager.MoveBlockAsync(value.Item1, value.Item2);
+            MockGridManager(value.Item1);
+            await manager.MoveBlockAsync(Vector3.zero, value.Item2);
             Assert.IsFalse(isLevelArraySwitchCalled && isBlocksArraySwitchCalled);
         }
 
         [Test]
         public async void MoveBlockAsync_CorrectIndex_SwitchUpWithEmpty()
         {
-            await manager.MoveBlockAsync(new Vector2Int(0,2), new Vector2Int(1, 2));
+            MockGridManager(new Vector2Int(0, 2));
+            await manager.MoveBlockAsync(Vector3.zero, new Vector2Int(1, 2));
             Assert.IsFalse(isLevelArraySwitchCalled && isBlocksArraySwitchCalled);
+        }
+
+
+        private void MockGridManager(Vector2Int cellIndex)
+        {
+            var gridManager = new Mock<IGridManager>();
+            gridManager.Setup(g => g.GetCellIndexByScreenPosition(It.IsAny<Vector3>())).Returns(cellIndex);
+            Container.Bind<IGridManager>().FromInstance(gridManager.Object);
         }
     }
 }

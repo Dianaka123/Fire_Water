@@ -18,17 +18,18 @@ MonoBehaviour:
   Backgrounds:
   - Sprite: {fileID: 21300000, guid: f8a0a7b2a023ba34d974ffd49af15a3c, type: 3}
     BoardConfig:
-      RelativeSideOffset: 0.1
-      RelativeBottomOffset: 0.2
+      RelativeSideOffset: 0.107
+      RelativeBottomOffset: 0.179
     StartLevelId: 1
-    EndLevelId: 3
-  Balloon:
+    EndLevelId: 4
+  Balloons:
     Sprites:
     - {fileID: 21300000, guid: 52bd41574116939429efe5788e39f447, type: 3}
     - {fileID: 21300000, guid: ba33c887ef53095459037a717b7c1bb1, type: 3}
     TotalCount: 3
     Prefab: {fileID: 4505333282574644595, guid: 62f63ca0b8e02d74d8979573eab0d710, type: 3}
-    RelativeSize: 0.192
+    RelativeSize: 0.2
+    RelativeBottomOffset: 0.1
     Duration: 20
-    MinSpeed: 0.1
-    MaxSpeed: 0.6
+    MinSpeed: 0.3
+    MaxSpeed: 0.9

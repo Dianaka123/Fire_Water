@@ -1,12 +1,12 @@
-using Assets.Scripts.Configs;
+using Assets.Scripts.ScriptableObjects;
+using Assets.Scripts.Data;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Views;
 using UnityEngine;
-using Zenject;
 
 namespace Assets.Scripts.Managers
 {
-    public class BalloonManager : IInitializable
+    public class BalloonManager : IBallonManager
     {
         private struct BalloonParams
         {
@@ -18,7 +18,6 @@ namespace Assets.Scripts.Managers
             public float AmpX;
         }
 
-        private readonly GameResources _gameResources;
         private readonly IUIManger _uiManager;
 
         private BalloonConfig _balloonConfig;
@@ -26,19 +25,15 @@ namespace Assets.Scripts.Managers
 
         public BalloonManager(GameResources gameResources, IUIManger uiManger)
         {
-            _gameResources = gameResources;
             _uiManager = uiManger;
-        }
 
-        public void Initialize()
-        {
-            _balloonConfig = _gameResources.Balloon;
+            _balloonConfig = gameResources.Balloons;
             _balloonParams = new BalloonParams[_balloonConfig.TotalCount];
         }
 
         public void SpawnBallons()
         {
-            var bottomOffset = _uiManager.Size.y * _gameResources.Backgrounds[0].BoardConfig.RelativeBottomOffset;
+            var bottomOffset = _uiManager.Size.y * _balloonConfig.RelativeBottomOffset;
             var stepY = (_uiManager.Size.y - bottomOffset)  / (_balloonConfig.TotalCount + 1);
 
             for (int i = 0; i < _balloonConfig.TotalCount; i++)
@@ -62,7 +57,7 @@ namespace Assets.Scripts.Managers
             }
         }
 
-        public void MoveBalloons()
+        public void MoveBalloonsBySin()
         {
             var time = Time.time;
 

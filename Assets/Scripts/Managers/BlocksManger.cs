@@ -1,4 +1,4 @@
-using Assets.Scripts.Configs;
+using Assets.Scripts.ScriptableObjects;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services;
 using Assets.Scripts.Services.Data;
@@ -27,7 +27,7 @@ namespace Assets.Scripts.Managers
         {
             ClearBlocks();
 
-            if(_blocks == null || _blocks?.Length != level.Length)
+            if (_blocks == null || _blocks?.Length != level.Length)
             {
                 _blocks = new Array2D<Block>(level.RowCount, level.ColumnCount);
             }
@@ -63,6 +63,7 @@ namespace Assets.Scripts.Managers
             _blocks[cellFrom] = block2;
 
             UpdateSiblingIndices();
+
             await SwitchBlocksAnimationAsync(block1, block2, startPosition, endPosition);
         }
 
@@ -85,7 +86,7 @@ namespace Assets.Scripts.Managers
 
         private void ClearBlocks()
         {
-            if(_blocks == null)
+            if (_blocks == null)
             {
                 return;
             }
@@ -140,7 +141,7 @@ namespace Assets.Scripts.Managers
                     counter++;
                 }
             });
-                    
+
         }
     }
 }

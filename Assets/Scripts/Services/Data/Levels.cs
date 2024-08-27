@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Assets.Scripts.Configs
+namespace Assets.Scripts.ScriptableObjects
 {
     public class Levels
     {

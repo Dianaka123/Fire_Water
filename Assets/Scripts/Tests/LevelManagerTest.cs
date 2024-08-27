@@ -1,4 +1,4 @@
-using Assets.Scripts.Configs;
+using Assets.Scripts.ScriptableObjects;
 using Assets.Scripts.Managers;
 using Assets.Scripts.Services.Interfaces;
 using Assets.Scripts.Wrappers;
@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using UnityEngine;
 using Zenject;
+using Assets.Scripts.Data;
 
 namespace Assets.Scripts.Tests
 {

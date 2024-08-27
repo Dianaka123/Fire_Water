@@ -1,4 +1,4 @@
-using Assets.Scripts.Configs;
+using Assets.Scripts.ScriptableObjects;
 using UnityEngine;
 using Zenject;
 

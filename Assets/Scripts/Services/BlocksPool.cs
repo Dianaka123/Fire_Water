@@ -1,4 +1,4 @@
-using Assets.Scripts.Configs;
+using Assets.Scripts.ScriptableObjects;
 using Assets.Scripts.Views;
 using ModestTree;
 using System.Collections.Generic;

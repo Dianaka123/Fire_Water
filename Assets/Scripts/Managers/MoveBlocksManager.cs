@@ -2,7 +2,6 @@ using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Interfaces;
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 namespace Assets.Scripts.Managers
@@ -25,31 +24,18 @@ namespace Assets.Scripts.Managers
             _boardNormalizer = boardNormalizer;
         }
 
-        public async UniTask MoveBlockAsync(Vector2Int from, Vector2Int to)
+        public async UniTask MoveBlockAsync(Vector3 startPosition, Vector2Int directon)
         {
-            if(to.x >= _column
-                || to.x < 0
-                || to.y < 0
-                || to.y >= _row
-                || from == to)
+            var startCell = _gridManager.GetCellIndexByScreenPosition(startPosition);
+
+            if (startCell == null)
             {
                 return;
             }
 
-            var isUp = (to - from).y > 0;
+            var nextCell = startCell.Value + directon;
 
-            if (_levelManager.IsEmptyCell(from) 
-                || (isUp && _levelManager.IsEmptyCell(to)))
-            {
-                return;
-            }
-
-            _levelManager.SwitchBlocks(from, to);
-
-            var startPosition = _gridManager.GetScreenPositionByCellIndex(from);
-            var endPosition = _gridManager.GetScreenPositionByCellIndex(to);
-
-            await _blocksManger.SwitchBlocksAsync(from, to, startPosition, endPosition);
+            await MoveBlocksByCellAsync(startCell.Value, nextCell);
         }
 
         public async UniTask ReshuffleAsync()
@@ -85,13 +71,40 @@ namespace Assets.Scripts.Managers
                     var value = levelSequence[x, y];
                     if (value != _levelManager.EmptyCellId)
                     {
-                        animations.Add(MoveBlockAsync(new Vector2Int(x, y), new Vector2Int(x, currentBottom)));
+                        animations.Add(MoveBlocksByCellAsync(new Vector2Int(x, y), new Vector2Int(x, currentBottom)));
                         currentBottom++;
                     }
                 }
             }
 
             await UniTask.WhenAll(animations);
+        }
+
+        private async UniTask MoveBlocksByCellAsync(Vector2Int from, Vector2Int to)
+        {
+            if (to.x >= _column
+                || to.x < 0
+                || to.y < 0
+                || to.y >= _row
+                || from == to)
+            {
+                return;
+            }
+
+            var isUp = (to - from).y > 0;
+
+            if (_levelManager.IsEmptyCell(from)
+                || (isUp && _levelManager.IsEmptyCell(to)))
+            {
+                return;
+            }
+
+            _levelManager.SwitchBlocks(from, to);
+
+            var startPosition = _gridManager.GetScreenPositionByCellIndex(from);
+            var endPosition = _gridManager.GetScreenPositionByCellIndex(to);
+
+            await _blocksManger.SwitchBlocksAsync(from, to, startPosition, endPosition);
         }
     }
 }

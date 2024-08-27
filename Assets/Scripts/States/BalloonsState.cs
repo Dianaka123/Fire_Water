@@ -23,7 +23,7 @@ namespace Assets.Scripts.States
 
         public override UniTask Run(CancellationToken token)
         {
-            _balloonManager.MoveBalloons();
+            _balloonManager.MoveBalloonsBySin();
             return UniTask.CompletedTask;
         }
     }

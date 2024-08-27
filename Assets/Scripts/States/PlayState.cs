@@ -12,7 +12,6 @@ namespace Assets.Scripts.States
 {
     public class PlayState : State
     {
-        private readonly GridManager _gridManager;
         private readonly ILevelManager _levelManager;
         private readonly MoveBlocksManager _moveBlocksManager;
         private readonly IInputSystem _inputSystem;
@@ -22,12 +21,11 @@ namespace Assets.Scripts.States
 
         private bool _isInputEnabled;
 
-        public PlayState(GridManager gridManager,IInputSystem inputSystem,
+        public PlayState(IInputSystem inputSystem,
             GameSM context, MoveBlocksManager moveBlocksManager,
             ILevelManager levelManager, LazyInject<NextLevelState> nextLevelState,
             IUIManger uimanger, LazyInject<RestartLevelState> restartLevelState) : base(context)
         {
-            _gridManager = gridManager;
             _inputSystem = inputSystem;
             _moveBlocksManager = moveBlocksManager;
             _levelManager = levelManager;
@@ -59,19 +57,7 @@ namespace Assets.Scripts.States
                 return;
             }
 
-            var swipeValue = swipe.Value;
-            var startIndex = _gridManager.GetCellIndexByScreenPosition(swipeValue.startPosition);
-            
-            if (startIndex == null)
-            {
-                return;
-            }
-
-            var step = GetStepByDirection(swipeValue.Direction);
-
-            var nextCell = startIndex.Value + step;
-
-            await MoveAndReshuffle(startIndex.Value, nextCell);
+            await MoveAndReshuffle(swipe.Value.startPosition, GetStepByDirection(swipe.Value.Direction));
 
             if (_levelManager.IsLevelCompleted())
             {
@@ -96,10 +82,10 @@ namespace Assets.Scripts.States
             GoTo(_nextLevelState.Value).Forget();
         }
 
-        private async UniTask MoveAndReshuffle(Vector2Int from, Vector2Int to)
+        private async UniTask MoveAndReshuffle(Vector3 startPosition, Vector2Int directon)
         {
             _isInputEnabled = false;
-            await _moveBlocksManager.MoveBlockAsync(from, to);
+            await _moveBlocksManager.MoveBlockAsync(startPosition, directon);
             await _moveBlocksManager.CheckFallBlocksAsync();
             await _moveBlocksManager.ReshuffleAsync();
             _isInputEnabled = true;
