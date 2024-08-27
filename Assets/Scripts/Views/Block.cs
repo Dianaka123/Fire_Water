@@ -10,6 +10,7 @@ namespace Assets.Scripts.Views
     public class Block : MonoBehaviour
     {
         private static readonly int DestroyHash = Animator.StringToHash("Destroy");
+        private static readonly int StartDelayHash = Animator.StringToHash("StartDelay");
 
         [SerializeField]
         private Animator _animator;
@@ -36,6 +37,11 @@ namespace Assets.Scripts.Views
                     transform.SetSiblingIndex(value);
                 }
             }
+        }
+
+        private void Start()
+        {
+            _animator.SetFloat(StartDelayHash, Random.Range(0.0f, 1.0f));
         }
 
         public void SetSize(float cellSize)
