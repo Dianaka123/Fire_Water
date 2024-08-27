@@ -2,18 +2,6 @@
 "levels":
 [
 	{
-		"columnCount": 4,
-		"rowCount": 6,
-		"levelBlocksSequence" :
-								[
-							   -1, 1, -1, -1,
-							   1, 0, -1, -1,
-							   1, 1, -1, 1,
-							   0, 1, 0, 0, 
-							   1, 0, 1, 1,
-							   1, 0, 1, 1]
-	},
-	{
 		"columnCount": 5,
 		"rowCount": 2,
 		"levelBlocksSequence" :
@@ -32,17 +20,17 @@
 							   1, 0, 1, 1, 
 							   1, 0, 1, 1]
 	},
-	
 	{
-	 "columnCount": 3,
-	 "rowCount": 5,
-	 "levelBlocksSequence" :
-	 						[
-							-1, -1, 1,
-							-1, -1, 0,
-							0, 0 ,1,
-							1, 1, 0, 
-							1, 1, 0]
+		"columnCount": 4,
+		"rowCount": 6,
+		"levelBlocksSequence" :
+								[
+							   -1, 1, -1, -1,
+							   1, 0, -1, -1,
+							   1, 1, -1, 1,
+							   0, 1, 0, 0, 
+							   1, 0, 1, 1,
+							   1, 0, 1, 1]
 	}
 ]
 }
