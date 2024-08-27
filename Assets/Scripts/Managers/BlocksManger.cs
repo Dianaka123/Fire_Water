@@ -1,4 +1,3 @@
-using Assets.Scripts.ScriptableObjects;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services;
 using Assets.Scripts.Services.Data;
@@ -12,7 +11,7 @@ namespace Assets.Scripts.Managers
 {
     public class BlocksManger : IBlockManager
     {
-        private const float MoveDuration = 0.5f;
+        private const float MoveDuration = 0.2f;
 
         private readonly BlocksPool _pool;
 
