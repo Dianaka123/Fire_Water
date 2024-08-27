@@ -45,6 +45,7 @@ namespace Assets.Scripts.Configs
         [Range(0, 1)]
         public float RelativeSize;
 
+        [Min(0.1f)]
         public float Duration;
 
         //TODO: Constrain for min max

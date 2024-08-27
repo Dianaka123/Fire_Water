@@ -12,6 +12,7 @@ namespace Assets.Scripts.Views
         private RectTransform _rectTransform;
 
         public float Speed;
+        public Vector2 Size => _rectTransform.sizeDelta;
 
         public void SetPosition(Vector2 position)
         {
@@ -26,7 +27,7 @@ namespace Assets.Scripts.Views
      
         public void ResizeImage(float size)
         {
-            var originalSize = _rectTransform.sizeDelta;
+            var originalSize = Size;
             var scale = size / originalSize.x;
             _rectTransform.sizeDelta = new Vector2(scale * originalSize.x, scale * originalSize.y);
         }

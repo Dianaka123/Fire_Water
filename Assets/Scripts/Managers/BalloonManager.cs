@@ -1,6 +1,5 @@
 using Assets.Scripts.Configs;
 using Assets.Scripts.Managers.Interfaces;
-using Assets.Scripts.States.Contexts;
 using Assets.Scripts.Views;
 using UnityEngine;
 using Zenject;
@@ -39,24 +38,26 @@ namespace Assets.Scripts.Managers
 
         public void SpawnBallons()
         {
-            var offsetY = _uiManager.Size.y * _gameResources.Backgrounds[0].BoardConfig.RelativeBottomOffset;
-            var stepY = (_uiManager.Size.y - offsetY)  / (_balloonConfig.TotalCount + 2);
+            var bottomOffset = _uiManager.Size.y * _gameResources.Backgrounds[0].BoardConfig.RelativeBottomOffset;
+            var stepY = (_uiManager.Size.y - bottomOffset)  / (_balloonConfig.TotalCount + 1);
 
             for (int i = 0; i < _balloonConfig.TotalCount; i++)
             {
-                var ballonPrefab = GameObject.Instantiate(_balloonConfig.Prefab, _uiManager.BallonRoot);
-                SetRandomSprite(ballonPrefab);
+                var ballonView = GameObject.Instantiate(_balloonConfig.Prefab, _uiManager.BallonRoot);
+                SetRandomSprite(ballonView);
                 
                 var speed = Random.Range(_balloonConfig.MinSpeed, _balloonConfig.MaxSpeed);
 
+                var currentOffsetY = bottomOffset + (i + 1) * stepY;
+
                 _balloonParams[i] = new BalloonParams
                 {
-                    Balloon = ballonPrefab,
-                    StartY = offsetY + (i + 1) * stepY - _uiManager.Size.y / 2,
-                    Duration = 10 / speed,
+                    Balloon = ballonView,
+                    StartY = currentOffsetY - _uiManager.Size.y / 2,
+                    Duration = _balloonConfig.Duration / speed,
                     StartPhase = Random.Range(0, 1),
                     AmpY = stepY / 2,
-                    AmpX = _uiManager.Size.x / 2,
+                    AmpX = _uiManager.Size.x / 2 + ballonView.Size.x,
                 };
             }
         }
@@ -73,11 +74,10 @@ namespace Assets.Scripts.Managers
                 ballon.Balloon.SetPosition(new Vector2 (x, y));
             }
         }
-        
 
         private void SetRandomSprite(BalloonView ballonPrefab)
         {
-            var randomSpriteIndex = Random.Range(0, _balloonConfig.Sprites.Count - 1);
+            int randomSpriteIndex = Random.Range(0, _balloonConfig.Sprites.Count);
             var sprite = _balloonConfig.Sprites[randomSpriteIndex];
             ballonPrefab.SetImage(sprite);
             ballonPrefab.ResizeImage(GetSize());

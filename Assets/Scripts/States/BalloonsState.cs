@@ -3,7 +3,6 @@ using Assets.Scripts.StateMachine;
 using Assets.Scripts.States.Contexts;
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using UnityEngine;
 
 namespace Assets.Scripts.States
 {
