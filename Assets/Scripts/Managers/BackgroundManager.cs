@@ -22,28 +22,29 @@ namespace Assets.Scripts.Managers
         {
             var levelId = levelIndex + 1;
 
-            if (!IsLevelIndexInBoard(_currentBackgroundConfig, levelId))
+            if (IsLevelIndexInBoard(_currentBackgroundConfig, levelId))
             {
-
-                var config = _backgroundConfigs.Where(config => IsLevelIndexInBoard(config, levelId))
-                                  .First();
-
-                if (config.Sprite != null)
-                {
-                    _currentBackgroundConfig = config;
-                }
-                else
-                {
-                    //Can be loaded default background
-                    throw new ArgumentException($"No background for {levelId}");
-                }
-
-                _backgroundData = new BackgroundData()
-                {
-                    Sprite = _currentBackgroundConfig.Sprite,
-                    BoardConfig = _currentBackgroundConfig.BoardConfig,
-                };
+                return _backgroundData;
             }
+
+            var config = _backgroundConfigs.Where(config => IsLevelIndexInBoard(config, levelId))
+                              .First();
+
+            if (config.Sprite != null)
+            {
+                _currentBackgroundConfig = config;
+            }
+            else
+            {
+                //Can be loaded default background
+                throw new ArgumentException($"No background for {levelId}");
+            }
+
+            _backgroundData = new BackgroundData()
+            {
+                Sprite = _currentBackgroundConfig.Sprite,
+                BoardConfig = _currentBackgroundConfig.BoardConfig,
+            };
 
             return _backgroundData;
         }

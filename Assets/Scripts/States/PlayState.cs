@@ -13,7 +13,7 @@ namespace Assets.Scripts.States
     public class PlayState : State
     {
         private readonly ILevelManager _levelManager;
-        private readonly MoveBlocksManager _moveBlocksManager;
+        private readonly GridManipulatorFacade _gridManipulatorFacade;
         private readonly IInputSystem _inputSystem;
         private readonly LazyInject<NextLevelState> _nextLevelState;
         private readonly LazyInject<RestartLevelState> _restartLevelState;
@@ -22,12 +22,12 @@ namespace Assets.Scripts.States
         private bool _isInputEnabled;
 
         public PlayState(IInputSystem inputSystem,
-            GameSM context, MoveBlocksManager moveBlocksManager,
+            GameSM context, GridManipulatorFacade gridManipulatorFacade,
             ILevelManager levelManager, LazyInject<NextLevelState> nextLevelState,
             IUIManger uimanger, LazyInject<RestartLevelState> restartLevelState) : base(context)
         {
             _inputSystem = inputSystem;
-            _moveBlocksManager = moveBlocksManager;
+            _gridManipulatorFacade = gridManipulatorFacade;
             _levelManager = levelManager;
             _nextLevelState = nextLevelState;
             _uimanger = uimanger;
@@ -57,7 +57,11 @@ namespace Assets.Scripts.States
                 return;
             }
 
-            await MoveAndReshuffle(swipe.Value.startPosition, GetStepByDirection(swipe.Value.Direction));
+            var direction = GetStepByDirection(swipe.Value.Direction);
+
+            _isInputEnabled = false;
+            await _gridManipulatorFacade.SwitchCellsThenNormilize(swipe.Value.startPosition, direction);
+            _isInputEnabled = true;
 
             if (_levelManager.IsLevelCompleted())
             {
@@ -80,15 +84,6 @@ namespace Assets.Scripts.States
         private void Next()
         {
             GoTo(_nextLevelState.Value).Forget();
-        }
-
-        private async UniTask MoveAndReshuffle(Vector3 startPosition, Vector2Int directon)
-        {
-            _isInputEnabled = false;
-            await _moveBlocksManager.MoveBlockAsync(startPosition, directon);
-            await _moveBlocksManager.CheckFallBlocksAsync();
-            await _moveBlocksManager.ReshuffleAsync();
-            _isInputEnabled = true;
         }
 
         private Vector2Int GetStepByDirection(Direction direction)

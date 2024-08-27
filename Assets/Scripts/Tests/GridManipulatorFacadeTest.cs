@@ -2,6 +2,7 @@ using Assets.Scripts.Managers;
 using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services.Interfaces;
 using Assets.Scripts.Wrappers;
+using Cysharp.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -14,35 +15,37 @@ using Zenject;
 
 namespace Assets.Scripts.Tests
 {
-    public class MoveBlocksManagerTest: ZenjectUnitTestFixture
+    public class GridManipulatorFacadeTest: ZenjectUnitTestFixture
     {
         private Array2D<int> _levelSequence = new Array2D<int>(new int[]
                 {
+                    0, 0, 0, 0,
                     1, 1, -1, -1,
-                    0, 0, 0, 0
                 }, 2, 4);
+        // x - 4, y - 2
 
         private bool isLevelArraySwitchCalled;
         private bool isBlocksArraySwitchCalled;
 
         private static (Vector2Int, Vector2Int)[] correctIndexes = new[]
         {
-            (new Vector2Int(0, 1),new Vector2Int(1, 0)),
-            (new Vector2Int(0, 1), new Vector2Int(0, -1)),
-            (new Vector2Int(0, 1), new Vector2Int(0, 1)),
-            (new Vector2Int(1, 1), new Vector2Int(-1, -1)),
+            (new Vector2Int(1, 0), Vector2Int.left),
+            (new Vector2Int(1, 0), Vector2Int.right),
+            (new Vector2Int(1, 0), Vector2Int.up),
+            (new Vector2Int(1, 1), Vector2Int.down),
         };
 
         private static (Vector2Int, Vector2Int)[] incorrectIndexes = new[]
         {
-            (new Vector2Int(0, 0),new Vector2Int(0, -1)),
-            (new Vector2Int(0, 0), new Vector2Int(-1, 0)),
-            (new Vector2Int(0, 3), new Vector2Int(0, 1)),
-            (new Vector2Int(1, 0), new Vector2Int(1, 0)),
+            (new Vector2Int(0, 0), Vector2Int.left),
+            (new Vector2Int(0, 0), Vector2Int.down),
+            (new Vector2Int(3, 0), Vector2Int.right),
+            (new Vector2Int(0, 1), Vector2Int.up),
+            (new Vector2Int(2, 1), Vector2Int.down),
         };
 
         [Inject]
-        private MoveBlocksManager manager;
+        private GridManipulatorFacade facade;
 
         [SetUp]
         public void Init()
@@ -67,41 +70,41 @@ namespace Assets.Scripts.Tests
             Container.Bind<ILevelManager>().FromInstance(levelManagerMock.Object);
             Container.Bind<IBlockManager>().FromInstance(blockManagerMock.Object);
             Container.Bind<IBoardNormalizer>().FromInstance(new Mock<IBoardNormalizer>().Object);
-            Container.Bind<MoveBlocksManager>().AsSingle();
+            Container.Bind<GridManipulatorFacade>().AsSingle();
 
-            Container.Inject(this);
         }
 
         [TestCaseSource("correctIndexes")]
-        public async void MoveBlockAsync_CorrectIndexes_SwitchCalled((Vector2Int, Vector2Int) value)
+        public void MoveBlockAsync_CorrectIndexes_SwitchCalled((Vector2Int from, Vector2Int direction) value)
         {
-            MockGridManager(value.Item1);
-            await manager.MoveBlockAsync(Vector3.zero, value.Item2);
+            MockGridManager(value.from);
+            facade.SwitchCellsThenNormilize(Vector3.zero, value.direction).Forget();
             Assert.IsTrue(isLevelArraySwitchCalled && isBlocksArraySwitchCalled);
         }
 
         [TestCaseSource("incorrectIndexes")]
-        public async void MoveBlockAsync_IncorrectIndexes_SwitchCalled((Vector2Int, Vector2Int) value)
+        public void MoveBlockAsync_IncorrectIndexes_SwitchCalled((Vector2Int from, Vector2Int direction) value)
         {
-            MockGridManager(value.Item1);
-            await manager.MoveBlockAsync(Vector3.zero, value.Item2);
+            MockGridManager(value.from);
+            facade.SwitchCellsThenNormilize(Vector3.zero, value.direction).Forget();
             Assert.IsFalse(isLevelArraySwitchCalled && isBlocksArraySwitchCalled);
         }
 
         [Test]
-        public async void MoveBlockAsync_CorrectIndex_SwitchUpWithEmpty()
+        public void MoveBlockAsync_CorrectIndex_SwitchUpWithEmpty()
         {
             MockGridManager(new Vector2Int(0, 2));
-            await manager.MoveBlockAsync(Vector3.zero, new Vector2Int(1, 2));
+            facade.SwitchCellsThenNormilize(Vector3.zero, Vector2Int.up).Forget();
             Assert.IsFalse(isLevelArraySwitchCalled && isBlocksArraySwitchCalled);
         }
-
 
         private void MockGridManager(Vector2Int cellIndex)
         {
             var gridManager = new Mock<IGridManager>();
             gridManager.Setup(g => g.GetCellIndexByScreenPosition(It.IsAny<Vector3>())).Returns(cellIndex);
-            Container.Bind<IGridManager>().FromInstance(gridManager.Object);
+            Container.Rebind<IGridManager>().FromInstance(gridManager.Object);
+         
+            Container.Inject(this);
         }
     }
 }
