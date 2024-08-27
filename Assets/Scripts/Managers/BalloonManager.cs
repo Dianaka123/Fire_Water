@@ -44,7 +44,7 @@ namespace Assets.Scripts.Managers
             for (int i = 0; i < _balloonConfig.TotalCount; i++)
             {
                 var ballonView = GameObject.Instantiate(_balloonConfig.Prefab, _uiManager.BallonRoot);
-                SetRandomSprite(ballonView);
+                SetSprite(ballonView, i);
                 
                 var speed = Random.Range(_balloonConfig.MinSpeed, _balloonConfig.MaxSpeed);
 
@@ -75,10 +75,10 @@ namespace Assets.Scripts.Managers
             }
         }
 
-        private void SetRandomSprite(BalloonView ballonPrefab)
+        private void SetSprite(BalloonView ballonPrefab, int index)
         {
-            int randomSpriteIndex = Random.Range(0, _balloonConfig.Sprites.Count);
-            var sprite = _balloonConfig.Sprites[randomSpriteIndex];
+            int spriteIndex = index % _balloonConfig.Sprites.Count;
+            var sprite = _balloonConfig.Sprites[spriteIndex];
             ballonPrefab.SetImage(sprite);
             ballonPrefab.ResizeImage(GetSize());
         }
