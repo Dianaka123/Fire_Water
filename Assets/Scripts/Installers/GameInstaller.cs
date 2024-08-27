@@ -1,16 +1,19 @@
 using Assets.Scripts.Managers;
+using Assets.Scripts.Managers.Interfaces;
 using Assets.Scripts.Services;
 using Assets.Scripts.States;
 using Assets.Scripts.States.Contexts;
+using Assets.Scripts.Views;
 using Zenject;
 
 namespace Assets.Scripts.Installers
 {
     public class GameInstaller : MonoInstaller<GameInstaller>
     {
+        public UIManager UIManger;
+
         public override void InstallBindings()
         {
-
             InstallBuilders();
             InstallManagers();
 
@@ -18,6 +21,7 @@ namespace Assets.Scripts.Installers
             Container.BindInterfacesAndSelfTo<BoardNormalizer>().AsSingle();
             Container.BindInterfacesAndSelfTo<LevelJsonConverter>().AsSingle();
             Container.BindInterfacesAndSelfTo<SaveLevelService>().AsSingle();
+            Container.Bind<IUIManger>().FromInstance(UIManger);
             
             InstallStatemachines();
             InstallStates();
